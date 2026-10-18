@@ -1,0 +1,11 @@
+# Files not needed inside the image (keeps the build context small and
+# avoids rebuilding when they change).
+.git
+.gitignore
+.env
+Dockerfile
+.dockerignore
+docker-compose.yml
+docs/
+resources/
+README.md

@@ -1,0 +1,80 @@
+# =============================================================================
+# Runs the ROS 2 workspace container with a browser-accessible desktop.
+#
+# Run these commands from the repository root (the directory containing this file):
+#   docker compose up -d --build     build the image (first time) and start
+#   docker compose down              stop and remove the container
+# Then open http://127.0.0.1:8080 (no login required).
+#
+# Requirements on the host: NVIDIA driver + NVIDIA Container Toolkit
+# (see README.md, "Docker Usage").
+#
+# Optional overrides go in a `.env` file next to this one (it is git-ignored):
+#   PASSWD=a-better-password # password of the "ubuntu" account (e.g. for sudo prompts)
+#   HOST_BIND=0.0.0.0        # expose to your LAN instead of localhost only
+#                            # (WARNING: there is no login, so anyone on the
+#                            #  network could then use the desktop)
+# =============================================================================
+
+services:
+  FRE2027_ws:
+    container_name: FRE2027_ws
+
+    # Build from the Dockerfile in this directory and tag the result locally.
+    # Docker image names must be lowercase.
+    build: .
+    image: fre2027-ws:latest
+
+    # Selkies web desktop. Bound to localhost by default so the desktop is
+    # not reachable from other machines on the network: it has no login.
+    ports:
+      - '${HOST_BIND:-127.0.0.1}:8080:8080'
+
+    # Keep STDIN open and allocate a TTY (allows `docker attach`).
+    stdin_open: true
+    tty: true
+
+    # Give the container access to one NVIDIA GPU (for rendering, Gazebo and
+    # hardware video encoding).
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+    # Shared memory for the desktop, browser streaming and Gazebo / DDS.
+    # The Docker default (64 MB) is far too small.
+    shm_size: '2gb'
+
+    volumes:
+      # Mount this repository over the workspace src/ so edits made on the
+      # host or in the container persist and are visible on both sides.
+      # Relative path: works on any machine without editing.
+      - './:/home/ubuntu/ros2_ws/src'
+      # Use the host's timezone inside the container.
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
+
+    environment:
+      # Virtual display settings.
+      - DISPLAY_SIZEW=1920
+      - DISPLAY_SIZEH=1080
+      - DISPLAY_REFRESH=60
+      - DISPLAY_DPI=96
+      - DISPLAY_CDEPTH=24
+      # Password of the Linux account "ubuntu" inside the container. Not
+      # needed to open the web desktop (login is disabled below).
+      - PASSWD=${PASSWD:-fre2027}
+      # Streaming: NVIDIA hardware H.264 encoder.
+      - SELKIES_ENCODER=nvh264enc
+      - SELKIES_ENABLE_RESIZE=false
+      - SELKIES_VIDEO_BITRATE=8000
+      - SELKIES_FRAMERATE=60
+      - SELKIES_AUDIO_BITRATE=128000
+      # No username/password prompt in the browser. Safe only while the port
+      # is bound to 127.0.0.1 (see `ports` above); set this back to true if
+      # you expose the desktop to a network.
+      - SELKIES_ENABLE_BASIC_AUTH=false
+      - SELKIES_ENABLE_HTTPS=false
