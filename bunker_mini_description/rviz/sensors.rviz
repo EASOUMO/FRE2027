@@ -1,0 +1,49 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Enabled: true
+      Name: Grid
+    - Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Value: /robot_description
+      Enabled: true
+      Name: RobotModel
+    - Class: rviz_default_plugins/LaserScan
+      Enabled: true
+      Name: LaserScan
+      Size (m): 0.03
+      Topic:
+        Reliability Policy: Best Effort
+        Value: /scan
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: Camera depth
+      Topic:
+        Reliability Policy: Best Effort
+        Value: /camera/depth/image_raw
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: Camera image
+      Topic:
+        Reliability Policy: Best Effort
+        Value: /camera/image_raw
+  Global Options:
+    Fixed Frame: base_link
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 8
+      Name: Current View
+      Pitch: 0.6
+      Yaw: 3.5
+Window Geometry:
+  Height: 900
+  Width: 1400

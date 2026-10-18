@@ -1,0 +1,2624 @@
+<?xml version="1.0"?>
+<!-- Seed: 3658 -->
+<!-- Lettuce field: copy of ~/.ros/virtual_maize_field/generated.world, generated with
+     `ros2 run virtual_maize_field generate_world lettuce_field` (virtual_field_ws).
+     Changed: sensors plugin added, heightmap URI points at models/lettuce_field_heightmap,
+     and the heightmap image is scaled from 2048 to 1024 pixels, as in the maize
+     field: at 2048 the Gazebo window never showed the spawned robot. -->
+<sdf version="1.9">
+  <world name="virtual_maize_field">
+
+    <!-- Change max step size to increase the simulation speed but decrease the accuracy. -->
+    <physics name="10ms" type="ignored">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <!-- Not in the generated world: needed by the robots' lidar and camera -->
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <light type="directional" name="sun">
+      <!-- Disable shadows to avoid flickering on non-gpu pc, see: 
+           https://github.com/gazebosim/gz-sim/issues/2267 -->
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <scene>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <grid>false</grid>
+    </scene>
+
+    <model name="heightmap">
+      <static>true</static>
+      <link name="link">
+        <visual name="ground_plane">
+          <geometry>
+            <heightmap>
+              <use_terrain_paging>false</use_terrain_paging>
+              <texture>
+                <diffuse>model://materials/textures/grass_color.jpg</diffuse>
+                <normal>model://materials/textures/grass_normal.jpg</normal>
+                <size>4</size>
+              </texture>
+              <texture>
+                <diffuse>model://materials/textures/dirt_diffusespecular.png</diffuse>
+                <normal>model://materials/textures/flat_normal.png</normal>
+                <size>1</size>
+              </texture>
+              <!-- <texture>
+                <diffuse>model://materials/textures/grass_color.jpg</diffuse>
+                <normal>model://materials/textures/grass_normal.jpg</normal>
+                <size>4</size>
+              </texture> -->
+              <!-- Without this unused 3. texture the blend between the first 2 doesn"t work -->
+              <texture>
+                <diffuse>model://materials/textures/fungus_diffusespecular.png</diffuse>
+                <normal>model://materials/textures/flat_normal.png</normal>
+                <size>1</size>
+              </texture>
+              <blend>
+                <min_height>0.2</min_height>
+                <fade_dist>0.05</fade_dist>
+              </blend>
+              <!-- <blend>
+                <min_height>0.30000000000000004</min_height>
+                <fade_dist>0.05</fade_dist>
+              </blend> -->
+              <!-- Without this unused 3. texture the blend between the first 2 doesn"t work -->
+              <blend>
+                <min_height>4</min_height>
+                <fade_dist>5</fade_dist>
+              </blend>
+              <uri>model://lettuce_field_heightmap/virtual_maize_field_heightmap.png</uri>
+              <size>20.7 20.7 0.4</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>model://lettuce_field_heightmap/virtual_maize_field_heightmap.png</uri>
+              <size>20.7 20.7 0.4</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.758984174813315 -7.850355933647374 0.29685477963128815 0.0 0.0 0.6309246789801383</pose>
+      <name>lettuce_02_0000</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.7471715367626193 -7.501687895352698 0.29019985280529564 0.0 0.0 5.970366707436025</pose>
+      <name>lettuce_02_0001</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.7498052162202173 -7.191097393915541 0.29334812075548944 0.0 0.0 4.388429436262268</pose>
+      <name>lettuce_02_0002</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.7315747106296044 -6.891236951482451 0.29450991763350526 0.0 0.0 2.527802513954458</pose>
+      <name>lettuce_01_0003</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.7376801547852818 -6.567716537666569 0.2836098961629031 0.0 0.0 3.675608702732113</pose>
+      <name>lettuce_02_0004</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.7293312148524864 -6.216090847311945 0.28594686808192 0.0 0.0 4.258672425344858</pose>
+      <name>lettuce_01_0005</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.7347738960234926 -5.90037917746515 0.27602725791747934 0.0 0.0 5.338613999805609</pose>
+      <name>lettuce_01_0006</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.7230066025283473 -5.55448436688351 0.26538711039655605 0.0 0.0 4.856759748701346</pose>
+      <name>lettuce_01_0007</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.705344941449294 -5.230894086997274 0.2819395790043609 0.0 0.0 2.0643741120998302</pose>
+      <name>lettuce_02_0008</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.6788485963519657 -4.928892755500326 0.2871826931515903 0.0 0.0 0.12517097992353046</pose>
+      <name>lettuce_01_0009</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.6036951935295642 -4.562685419798059 0.3011121558561767 0.0 0.0 4.645701480788661</pose>
+      <name>lettuce_02_0010</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.5494037617900871 -4.280583936433499 0.2996501316759886 0.0 0.0 3.608714402776442</pose>
+      <name>lettuce_01_0011</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.479081831232768 -3.9806577641313923 0.287514677216199 0.0 0.0 6.009793288756508</pose>
+      <name>lettuce_02_0012</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.38222275313416193 -3.65690101881426 0.30965012035836215 0.0 0.0 0.8360939534016538</pose>
+      <name>lettuce_02_0013</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.3157624663089084 -3.3284638797263435 0.3355479101751704 0.0 0.0 4.027589923498118</pose>
+      <name>lettuce_02_0014</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.1848546520408753 -3.004791601976401 0.3258567855257491 0.0 0.0 0.08058943807246434</pose>
+      <name>lettuce_01_0015</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.08679858579368745 -2.7217669674426466 0.3276590270727757 0.0 0.0 0.8113730977409912</pose>
+      <name>lettuce_01_0016</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.045042669578782044 -2.4081681902581975 0.3090880414841168 0.0 0.0 5.542251876142351</pose>
+      <name>lettuce_01_0017</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.1771093111846021 -2.1482052396390943 0.3084414873711671 0.0 0.0 0.6261822247040691</pose>
+      <name>lettuce_01_0018</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.31046958746201164 -1.844121221427448 0.31184862515846073 0.0 0.0 0.6393022928448313</pose>
+      <name>lettuce_02_0019</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.48689337600406796 -1.5756479503243417 0.3094601839079954 0.0 0.0 2.6624892090990047</pose>
+      <name>lettuce_01_0020</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.6272663145127895 -1.2848221595533988 0.3360038630844698 0.0 0.0 3.0826410934728137</pose>
+      <name>lettuce_02_0021</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.8155814605575784 -0.9962324809149281 0.3268428552024291 0.0 0.0 3.5097795082442396</pose>
+      <name>lettuce_01_0022</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.9594975329408377 -0.7388261267370371 0.3364236233478965 0.0 0.0 4.249251119105291</pose>
+      <name>lettuce_01_0023</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.1748347633250649 -0.4867857099934881 0.3437638916272384 0.0 0.0 5.540340791711587</pose>
+      <name>lettuce_01_0024</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.3650624819836714 -0.21694322177287956 0.3209214535663097 0.0 0.0 4.454906798093057</pose>
+      <name>lettuce_01_0025</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.5855879198479108 0.02166776655493514 0.3116899698523424 0.0 0.0 2.8161413850180392</pose>
+      <name>lettuce_02_0026</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.7934582751338513 0.2716286058055292 0.3243865924117915 0.0 0.0 3.2279257357520446</pose>
+      <name>lettuce_01_0027</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.2942705944127955 0.7318753844519332 0.2926409811485514 0.0 0.0 4.046049279919651</pose>
+      <name>lettuce_01_0028</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.5276091237226668 0.9421404003459906 0.2992074440264961 0.0 0.0 0.9618184517244593</pose>
+      <name>lettuce_01_0029</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.7836381483682766 1.176416197638207 0.30593260279836865 0.0 0.0 3.1461636121497385</pose>
+      <name>lettuce_02_0030</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.4629778164347673 1.9147397864250586 0.34357532728400875 0.0 0.0 2.287237116729341</pose>
+      <name>lettuce_02_0031</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.667144562049348 2.1424269800350855 0.3268650161365781 0.0 0.0 4.588994940508084</pose>
+      <name>lettuce_01_0032</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.8723940774126033 2.383749477606316 0.32623191489120207 0.0 0.0 5.383564988974806</pose>
+      <name>lettuce_01_0033</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-4.079029570552041 2.652576270138163 0.3226451545219855 0.0 0.0 5.6670353287835225</pose>
+      <name>lettuce_01_0034</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.264491033223212 2.9119955832046367 0.31525948914310514 0.0 0.0 2.935449455351483</pose>
+      <name>lettuce_02_0035</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.411761520069757 3.178290682061445 0.3150267801084546 0.0 0.0 2.960090917393903</pose>
+      <name>lettuce_02_0036</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.609312793466134 3.451312313870157 0.32403817180818656 0.0 0.0 1.4780962826426571</pose>
+      <name>lettuce_02_0037</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.742119022580009 3.715761452855875 0.30760019029311386 0.0 0.0 1.9868337569410146</pose>
+      <name>lettuce_02_0038</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-5.073980085547368 4.28030067063261 0.30083330167308875 0.0 0.0 3.7463451441356996</pose>
+      <name>lettuce_01_0039</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-5.209715721908401 4.613717936929896 0.2892518668916772 0.0 0.0 3.926498448812912</pose>
+      <name>lettuce_02_0040</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-5.344177641924344 4.88957041250871 0.2932354831904387 0.0 0.0 5.98755720839007</pose>
+      <name>lettuce_01_0041</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-5.466767130575588 5.204649814987483 0.29496675925526683 0.0 0.0 0.44810523099727234</pose>
+      <name>lettuce_01_0042</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-5.584855346986356 5.505384877153188 0.28695525001490635 0.0 0.0 1.440262793764127</pose>
+      <name>lettuce_01_0043</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-5.665996524455153 5.799829057655839 0.26960838535105447 0.0 0.0 3.3438647017982532</pose>
+      <name>lettuce_01_0044</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-5.760675483229421 6.131288371665897 0.27070361232597306 0.0 0.0 2.4800567868033703</pose>
+      <name>lettuce_02_0045</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.7395396163625405 -7.848364853061602 0.2955612924125021 0.0 0.0 3.4041816678775465</pose>
+      <name>lettuce_02_0046</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.721795065370045 -7.512956457089835 0.31600059535349256 0.0 0.0 1.111977152922253</pose>
+      <name>lettuce_02_0047</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.7514669710225939 -7.224161091709397 0.3061220533746316 0.0 0.0 3.663244094314788</pose>
+      <name>lettuce_02_0048</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.7397040851545669 -6.880611763756105 0.2746105885743139 0.0 0.0 3.2601807886834266</pose>
+      <name>lettuce_01_0049</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.7353384541514452 -6.558348378636831 0.2924749942634696 0.0 0.0 1.99603037901494</pose>
+      <name>lettuce_01_0050</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.747894807007649 -6.2144139527470434 0.299304734357965 0.0 0.0 2.319920515000188</pose>
+      <name>lettuce_01_0051</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.7408740378711969 -5.8883456786600865 0.2957638319482785 0.0 0.0 0.9605898201896199</pose>
+      <name>lettuce_02_0052</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.7294340342802148 -5.552601456696352 0.3041442147952045 0.0 0.0 0.7401797895545761</pose>
+      <name>lettuce_01_0053</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.6824342996070103 -5.233359330876421 0.3048386431948883 0.0 0.0 6.013279932869621</pose>
+      <name>lettuce_02_0054</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.6800262599910802 -4.91306203672925 0.3115072872691704 0.0 0.0 2.747498099823144</pose>
+      <name>lettuce_01_0055</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.6248740685661673 -4.584338323401217 0.2955047620840125 0.0 0.0 4.539473868145533</pose>
+      <name>lettuce_01_0056</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.5811275394195852 -4.288785208259032 0.2922300844576442 0.0 0.0 4.857123853721246</pose>
+      <name>lettuce_01_0057</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.495142170654978 -3.991516650767115 0.31498887395644615 0.0 0.0 4.124869163766398</pose>
+      <name>lettuce_01_0058</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.4467929702590159 -3.677477139483768 0.30865240215504103 0.0 0.0 0.7295387097172195</pose>
+      <name>lettuce_01_0059</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.3548180174245925 -3.3743741538526777 0.31199271484194424 0.0 0.0 1.308173253556991</pose>
+      <name>lettuce_01_0060</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.2739873872240388 -3.0699126126002776 0.3292756995819218 0.0 0.0 0.6652677095072581</pose>
+      <name>lettuce_01_0061</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.1516961810025104 -2.778258723363753 0.3219439808573097 0.0 0.0 3.4468983725862596</pose>
+      <name>lettuce_02_0062</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.0727136150422567 -2.4540588184466783 0.3138312246794267 0.0 0.0 1.098610969987603</pose>
+      <name>lettuce_02_0063</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.9271485935969122 -2.145754521470913 0.32035532988754656 0.0 0.0 2.3230204364987475</pose>
+      <name>lettuce_01_0064</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.8103315398952999 -1.839586424531573 0.32094444862518784 0.0 0.0 0.4292501344606332</pose>
+      <name>lettuce_01_0065</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.6658045505985115 -1.5524838525784312 0.3064083719083357 0.0 0.0 5.3954487824810995</pose>
+      <name>lettuce_01_0066</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.5069520209103582 -1.286773126757503 0.29781399742984277 0.0 0.0 3.1784487359256386</pose>
+      <name>lettuce_01_0067</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.35428414153393567 -0.9631714356301273 0.3049835962652494 0.0 0.0 4.55996437670198</pose>
+      <name>lettuce_02_0068</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.19767770635897736 -0.7131252551604985 0.3001994538927458 0.0 0.0 2.3402615819460353</pose>
+      <name>lettuce_02_0069</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.01719556306084531 -0.4166350792322138 0.31181489604575363 0.0 0.0 2.8639121001512917</pose>
+      <name>lettuce_01_0070</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.1578442929926423 -0.19169679801097744 0.2887101080969405 0.0 0.0 5.564935491788996</pose>
+      <name>lettuce_01_0071</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.33511606961822943 0.05184336205657676 0.28363132307010713 0.0 0.0 4.757310677787782</pose>
+      <name>lettuce_01_0072</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.5070530104139122 0.31295151045414754 0.284437417504977 0.0 0.0 0.1980087379795658</pose>
+      <name>lettuce_01_0073</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.7199710450389707 0.5500627373236118 0.28230013576599844 0.0 0.0 4.402540783785252</pose>
+      <name>lettuce_01_0074</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.9389816009817158 0.7704245996521728 0.2937048658301595 0.0 0.0 4.406986648828732</pose>
+      <name>lettuce_01_0075</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.1224460683680648 1.0152465001343292 0.2947932308950473 0.0 0.0 4.813725716717023</pose>
+      <name>lettuce_01_0076</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.3475520512865173 1.2173815353228925 0.2793240905476776 0.0 0.0 2.892659076991218</pose>
+      <name>lettuce_02_0077</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.5925498372442266 1.4369542896896939 0.28527927723218943 0.0 0.0 0.22535989652840582</pose>
+      <name>lettuce_02_0078</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.8245958062981786 1.6974274455849632 0.26274780027279915 0.0 0.0 0.8463143216332206</pose>
+      <name>lettuce_02_0079</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.0723912890200133 1.9004008235236978 0.2778888945207889 0.0 0.0 4.061150552705908</pose>
+      <name>lettuce_02_0080</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.33477276583285 2.149925178435793 0.28775634688527274 0.0 0.0 4.478781937760282</pose>
+      <name>lettuce_02_0081</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.5539015012347184 2.3687275577310016 0.2917902907053124 0.0 0.0 2.8032037905191625</pose>
+      <name>lettuce_02_0082</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.719386948998629 2.5871853454177307 0.2879834041420903 0.0 0.0 2.4947099514887467</pose>
+      <name>lettuce_01_0083</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.9304890624640576 2.8261091200811803 0.2850740438819765 0.0 0.0 0.4660685962348861</pose>
+      <name>lettuce_02_0084</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.127776872036713 3.0769177466696602 0.2986307472740498 0.0 0.0 0.3262626691395759</pose>
+      <name>lettuce_01_0085</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.3477137902459555 3.3759313592853593 0.2913594482327184 0.0 0.0 4.957401365922505</pose>
+      <name>lettuce_02_0086</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.517099770474384 3.6446852449337284 0.32569763313858496 0.0 0.0 3.5652673976575677</pose>
+      <name>lettuce_02_0087</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.6984795496870593 3.9086277589524157 0.3025037857815704 0.0 0.0 1.753823334717289</pose>
+      <name>lettuce_01_0088</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.8796577540680053 4.188761648821678 0.30074142091066475 0.0 0.0 4.420203624034559</pose>
+      <name>lettuce_01_0089</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-4.025138137050187 4.491807006674839 0.29543872978694785 0.0 0.0 5.811994119345137</pose>
+      <name>lettuce_01_0090</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.18257683321739 4.780991464602448 0.2838432125069839 0.0 0.0 5.130388328504552</pose>
+      <name>lettuce_02_0091</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.313597628469862 5.0846749747764095 0.264905271192631 0.0 0.0 2.1269265725181303</pose>
+      <name>lettuce_02_0092</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.463200743640196 5.359555923172134 0.2739786289535479 0.0 0.0 3.9325885841504538</pose>
+      <name>lettuce_02_0093</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.544403117769343 5.650917380766111 0.2696281626942196 0.0 0.0 2.2965974031834167</pose>
+      <name>lettuce_02_0094</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.674695548136379 5.971014483132996 0.27053648255517987 0.0 0.0 6.031111461282137</pose>
+      <name>lettuce_02_0095</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.788299093585105 6.276027287696013 0.2580379388725949 0.0 0.0 0.026982186438341767</pose>
+      <name>lettuce_02_0096</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-4.865533833114376 6.612425308980037 0.24922820907675397 0.0 0.0 0.6190934360591852</pose>
+      <name>lettuce_02_0097</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.72292209033644 -7.813806115177701 0.2674671772642496 0.0 0.0 4.42568880201336</pose>
+      <name>lettuce_01_0098</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.7304883708562633 -7.501558861602227 0.2903918322739822 0.0 0.0 4.149028893438573</pose>
+      <name>lettuce_01_0099</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.758203358634444 -7.181467917478556 0.2776358911505054 0.0 0.0 2.765935540823871</pose>
+      <name>lettuce_02_0100</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.7542254811539015 -6.862187093062429 0.2531231549486878 0.0 0.0 2.674269271289918</pose>
+      <name>lettuce_01_0101</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.7269344603385397 -6.537729378355036 0.27621620213482323 0.0 0.0 2.248997592580289</pose>
+      <name>lettuce_01_0102</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.7529949031128558 -6.2231146847466245 0.2936694221645346 0.0 0.0 2.6671419561468417</pose>
+      <name>lettuce_01_0103</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.757254235759654 -5.917850514447095 0.30966487164071044 0.0 0.0 3.7157091741768427</pose>
+      <name>lettuce_02_0104</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.7212576612983606 -5.560929249530717 0.2940341746566123 0.0 0.0 2.777140612746293</pose>
+      <name>lettuce_01_0105</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.6880103890426943 -5.268841487453331 0.2706034704629705 0.0 0.0 3.351095763638358</pose>
+      <name>lettuce_02_0106</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.691035297162224 -4.975509644793429 0.28316940850758154 0.0 0.0 4.809029508782307</pose>
+      <name>lettuce_01_0107</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.6391180512928516 -4.6412644619053856 0.2844614377963206 0.0 0.0 3.671810653478346</pose>
+      <name>lettuce_02_0108</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.573534250901605 -4.322059230468795 0.2880344606685497 0.0 0.0 0.14559656245116373</pose>
+      <name>lettuce_01_0109</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.541683045866084 -4.011966919288939 0.29150353555739467 0.0 0.0 3.4230943428462823</pose>
+      <name>lettuce_01_0110</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.482292040997854 -3.676536305106107 0.30428059752484704 0.0 0.0 2.4391345688983215</pose>
+      <name>lettuce_01_0111</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.3803151771327036 -3.397389134674726 0.3107838483853447 0.0 0.0 1.4145691431470904</pose>
+      <name>lettuce_02_0112</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.3163650684716783 -3.0774503997233307 0.2947905151123828 0.0 0.0 4.835818546541892</pose>
+      <name>lettuce_02_0113</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.2095441470123456 -2.7708257085853454 0.29009080794472797 0.0 0.0 2.295268627632743</pose>
+      <name>lettuce_02_0114</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.1426741135678 -2.4601391337303786 0.3038242716927969 0.0 0.0 4.2151014557052155</pose>
+      <name>lettuce_02_0115</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.030605927407806 -2.175926186293066 0.2924160451000716 0.0 0.0 3.5167656917025725</pose>
+      <name>lettuce_01_0116</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.8976169265623606 -1.8714455285872587 0.3125331119548851 0.0 0.0 5.815294617885242</pose>
+      <name>lettuce_02_0117</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.7938331606903966 -1.5681164841178805 0.3108069789536256 0.0 0.0 0.9959213430200956</pose>
+      <name>lettuce_02_0118</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.6330672158417363 -1.2802616394460855 0.3002005472487601 0.0 0.0 0.22121968140646903</pose>
+      <name>lettuce_02_0119</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.5083142637029792 -0.9867311430072341 0.3024786794933575 0.0 0.0 4.916350207659222</pose>
+      <name>lettuce_01_0120</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.327650882102825 -0.6857889215317978 0.28191357968230174 0.0 0.0 0.46243078543671173</pose>
+      <name>lettuce_01_0121</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.190387425533441 -0.4198252522239672 0.2806748974070025 0.0 0.0 6.058335759703409</pose>
+      <name>lettuce_01_0122</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.0145030976823348 -0.10082256022515494 0.2941367966513026 0.0 0.0 3.442447990783671</pose>
+      <name>lettuce_01_0123</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.8498027256041418 0.14150860704245466 0.2906327293846445 0.0 0.0 6.179203749418694</pose>
+      <name>lettuce_02_0124</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.6611883239032148 0.42050004434189886 0.2988151047745011 0.0 0.0 5.5930687379902935</pose>
+      <name>lettuce_01_0125</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.4565061717547014 0.6628461710439251 0.30177936124889604 0.0 0.0 0.06051808807486551</pose>
+      <name>lettuce_02_0126</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.2376464113779228 0.927217985544327 0.2939458274771265 0.0 0.0 3.710494069121078</pose>
+      <name>lettuce_02_0127</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.05973204194493249 1.1801318348944154 0.28626920084746815 0.0 0.0 3.5622972465730127</pose>
+      <name>lettuce_02_0128</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.15891289420060223 1.396695025795146 0.28257094532338894 0.0 0.0 3.524658344797064</pose>
+      <name>lettuce_02_0129</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.3841734166865283 1.675534972721784 0.28781602142590085 0.0 0.0 3.882241270777957</pose>
+      <name>lettuce_01_0130</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.6083959511735422 1.8951785131730248 0.29927467233101984 0.0 0.0 4.197823612098309</pose>
+      <name>lettuce_02_0131</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.8472184985041566 2.1326445846273137 0.3036210407106996 0.0 0.0 2.1674626017426846</pose>
+      <name>lettuce_02_0132</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.0876355611345578 2.339514012913207 0.2981168626604858 0.0 0.0 1.7010567080792043</pose>
+      <name>lettuce_02_0133</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.3155916221534045 2.565254436578029 0.30048757064221376 0.0 0.0 1.4892992754303778</pose>
+      <name>lettuce_01_0134</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.571938499646374 2.7994486599694985 0.31836696777368784 0.0 0.0 3.486076484661675</pose>
+      <name>lettuce_01_0135</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.79307869955223 3.0224761702790124 0.31040602578476534 0.0 0.0 3.2326660662364253</pose>
+      <name>lettuce_01_0136</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.9930309010914862 3.249589144519427 0.3070440942084937 0.0 0.0 6.040009514483196</pose>
+      <name>lettuce_01_0137</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.191550639459034 3.4939366185184957 0.301456260506906 0.0 0.0 0.7667892447722326</pose>
+      <name>lettuce_02_0138</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.387613270045547 3.7386729258461076 0.30686109285628654 0.0 0.0 3.3177655186030375</pose>
+      <name>lettuce_02_0139</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.582442954638141 4.012782952392338 0.3017086461507784 0.0 0.0 1.6153644581647773</pose>
+      <name>lettuce_01_0140</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.7774209486104877 4.281540557371561 0.31656615526808035 0.0 0.0 3.818711346845563</pose>
+      <name>lettuce_01_0141</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.9184663152018886 4.550508881395907 0.3134016240132529 0.0 0.0 0.5975616045978347</pose>
+      <name>lettuce_02_0142</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.088791022538566 4.81525726609195 0.2999020730857613 0.0 0.0 3.59149405134572</pose>
+      <name>lettuce_02_0143</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.2549480342447357 5.134540742447521 0.29336782619453317 0.0 0.0 3.242167237318699</pose>
+      <name>lettuce_01_0144</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.3667005832288392 5.421981000372235 0.283393384209295 0.0 0.0 5.1466895346225074</pose>
+      <name>lettuce_01_0145</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.490770064720219 5.682674408770947 0.2796406146815847 0.0 0.0 4.427466617315737</pose>
+      <name>lettuce_02_0146</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.6357395661532053 5.976042415573583 0.2408403332181755 0.0 0.0 3.750491271760929</pose>
+      <name>lettuce_02_0147</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-3.7173786767069643 6.280941381014348 0.23865770397190064 0.0 0.0 4.857769647344138</pose>
+      <name>lettuce_01_0148</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.831251535916885 6.610240229473825 0.23447714217220603 0.0 0.0 2.493434441714796</pose>
+      <name>lettuce_02_0149</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-3.943054395203535 6.933093004531837 0.2320206663105725 0.0 0.0 2.647059563754621</pose>
+      <name>lettuce_02_0150</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.7594545153635 -7.843238487925232 0.27208561944401993 0.0 0.0 4.145948818019012</pose>
+      <name>lettuce_02_0151</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.759786341879864 -7.499446832779909 0.2808092162423374 0.0 0.0 4.483923511577271</pose>
+      <name>lettuce_01_0152</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.7484759966409174 -7.1522448369367995 0.27935199205705663 0.0 0.0 3.5630266318223405</pose>
+      <name>lettuce_01_0153</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.7435318484446727 -6.857752540963355 0.2776372149761516 0.0 0.0 2.6124801231884818</pose>
+      <name>lettuce_02_0154</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.723728551105851 -6.509105097970313 0.2664534308452214 0.0 0.0 4.1001074022779935</pose>
+      <name>lettuce_02_0155</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.730109222701306 -6.1935960373039345 0.26865502613969666 0.0 0.0 2.9231276676499354</pose>
+      <name>lettuce_02_0156</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.755517436318139 -5.87194443075794 0.26946893579495834 0.0 0.0 3.9367703342179996</pose>
+      <name>lettuce_01_0157</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.7436632645833745 -5.539972637199452 0.2825159694241395 0.0 0.0 0.7782434997756098</pose>
+      <name>lettuce_02_0158</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.7176993023519733 -5.206311219381781 0.2708462054550404 0.0 0.0 3.6982914499195916</pose>
+      <name>lettuce_02_0159</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.6951808500441095 -4.9073788009124755 0.2627093916316949 0.0 0.0 5.394255657036807</pose>
+      <name>lettuce_02_0160</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.62872692345715 -4.578176899189935 0.2757117095218651 0.0 0.0 4.805406364415777</pose>
+      <name>lettuce_01_0161</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.6116328551801677 -4.251234436922188 0.26031993998638214 0.0 0.0 2.325879570507317</pose>
+      <name>lettuce_02_0162</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.549555662901601 -3.9341474628789554 0.2557580331984442 0.0 0.0 2.589155153907141</pose>
+      <name>lettuce_02_0163</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.4712617238001107 -3.63862893115925 0.2540916041377753 0.0 0.0 3.2187242347000256</pose>
+      <name>lettuce_02_0164</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.411974761913302 -3.3103456258311548 0.2743085250890035 0.0 0.0 4.647818914894116</pose>
+      <name>lettuce_02_0165</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.350905284693787 -3.037485288011119 0.2856724916773316 0.0 0.0 5.482556027075268</pose>
+      <name>lettuce_01_0166</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.2478430446934192 -2.67506542068827 0.2896631895426325 0.0 0.0 1.2845553023550158</pose>
+      <name>lettuce_01_0167</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.1419544570682882 -2.3993943982736425 0.2839674029979439 0.0 0.0 2.8766044989308157</pose>
+      <name>lettuce_01_0168</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.0469409260093974 -2.1063162634051897 0.3044083309499822 0.0 0.0 2.5784650543778214</pose>
+      <name>lettuce_01_0169</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.954806808663778 -1.77531688421399 0.31248592825257804 0.0 0.0 5.0911857211056555</pose>
+      <name>lettuce_01_0170</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.811114885705048 -1.488008741055651 0.3107352475513877 0.0 0.0 5.854457542271851</pose>
+      <name>lettuce_02_0171</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.714057971714234 -1.1832777095264484 0.2807913615604884 0.0 0.0 1.9439359611733593</pose>
+      <name>lettuce_02_0172</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.5512156215855297 -0.8832241209020235 0.28231673054808804 0.0 0.0 3.241978549498634</pose>
+      <name>lettuce_01_0173</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.418281407885817 -0.5754382936516691 0.30352130771328567 0.0 0.0 1.903122930251801</pose>
+      <name>lettuce_02_0174</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.275256810049611 -0.30632782007799425 0.30177750224279315 0.0 0.0 2.3339672954958077</pose>
+      <name>lettuce_02_0175</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.1012035505588047 0.005412888662407589 0.32926824730329196 0.0 0.0 0.9108714747653021</pose>
+      <name>lettuce_02_0176</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.923655936648511 0.27271854862916384 0.3243407905063796 0.0 0.0 4.749622918792654</pose>
+      <name>lettuce_02_0177</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.7586556568653144 0.5426877543397091 0.33590757358296247 0.0 0.0 3.409510206046744</pose>
+      <name>lettuce_02_0178</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.6102352676041642 0.7699264822846115 0.3388572677818291 0.0 0.0 3.3033873600182715</pose>
+      <name>lettuce_01_0179</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.4440769863586473 1.047933679100381 0.32289104697023374 0.0 0.0 5.395575321550717</pose>
+      <name>lettuce_01_0180</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.2395241139112232 1.3219576826288038 0.3067153039960062 0.0 0.0 1.9638919519429385</pose>
+      <name>lettuce_01_0181</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.0178099784778374 1.5942372014922637 0.29793232666189456 0.0 0.0 2.693914903075681</pose>
+      <name>lettuce_02_0182</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.8148575362351516 1.8500255383238902 0.26439106773411064 0.0 0.0 0.5338570366292436</pose>
+      <name>lettuce_01_0183</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.6033173046268108 2.091288430982428 0.2703548684914047 0.0 0.0 6.100982502624963</pose>
+      <name>lettuce_02_0184</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.3934208199357016 2.322843835550821 0.2739109976770668 0.0 0.0 5.079144173541596</pose>
+      <name>lettuce_02_0185</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.1604397302606701 2.5189255539745927 0.27371812494189296 0.0 0.0 5.456130222735121</pose>
+      <name>lettuce_01_0186</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.06469658066796206 2.76617892816616 0.26933677987117005 0.0 0.0 6.244171715940502</pose>
+      <name>lettuce_02_0187</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.3060603808302467 3.0027355706924146 0.2795127775174752 0.0 0.0 0.237233605330743</pose>
+      <name>lettuce_02_0188</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.5623183022450318 3.2266576082622445 0.2875369662665514 0.0 0.0 4.548377658184104</pose>
+      <name>lettuce_02_0189</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.8040526949259295 3.435593517637874 0.2930104127717758 0.0 0.0 5.988458373533251</pose>
+      <name>lettuce_02_0190</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.0415453685852432 3.6836705969796553 0.3008195878971474 0.0 0.0 3.029258453814104</pose>
+      <name>lettuce_02_0191</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.2847244511673395 3.9334137281620007 0.2998238453790908 0.0 0.0 4.812163989700687</pose>
+      <name>lettuce_01_0192</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.4727620836661612 4.196382522744908 0.2993769267625765 0.0 0.0 3.966301648516218</pose>
+      <name>lettuce_01_0193</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.6601118900072842 4.439462174293351 0.2999289741938604 0.0 0.0 0.8415986127058434</pose>
+      <name>lettuce_02_0194</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.8436069757035936 4.687963145419924 0.3022471832966173 0.0 0.0 2.666042284653256</pose>
+      <name>lettuce_01_0195</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.0071335989807197 4.965727843794428 0.28309977391193336 0.0 0.0 0.6964740936312309</pose>
+      <name>lettuce_02_0196</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.172422531435981 5.264857942786031 0.281759614285241 0.0 0.0 0.2841926530661834</pose>
+      <name>lettuce_01_0197</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.3327359814721262 5.511669733355176 0.2881124119481573 0.0 0.0 4.5825396689371</pose>
+      <name>lettuce_02_0198</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.482205162608132 5.847285090651586 0.2583217414152221 0.0 0.0 1.5535269918437913</pose>
+      <name>lettuce_01_0199</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.584130717934866 6.123534688135304 0.24119934359285602 0.0 0.0 4.809499387324375</pose>
+      <name>lettuce_02_0200</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.7176605843686463 6.411544615708444 0.23138167650946007 0.0 0.0 5.761633060698464</pose>
+      <name>lettuce_02_0201</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.823772660967174 6.715386996951119 0.23363795112559288 0.0 0.0 5.730051286034417</pose>
+      <name>lettuce_02_0202</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-2.9289525950165665 7.049457933201887 0.24918284652588732 0.0 0.0 0.2771447290377731</pose>
+      <name>lettuce_01_0203</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.74499084305132 -7.839293545542246 0.2878294877512602 0.0 0.0 5.642179201143255</pose>
+      <name>lettuce_01_0204</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.7266798836730795 -7.532077810769956 0.29061263085976563 0.0 0.0 6.110595873788604</pose>
+      <name>lettuce_01_0205</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.731693050465753 -7.218644876102738 0.29331635719148713 0.0 0.0 0.33279801497603634</pose>
+      <name>lettuce_02_0206</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.752090865513556 -6.876347636482235 0.30223452087543434 0.0 0.0 5.350162598365528</pose>
+      <name>lettuce_02_0207</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.735575716708698 -6.5229767511697565 0.29186679044899355 0.0 0.0 2.7015103461498984</pose>
+      <name>lettuce_02_0208</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.725347115582697 -6.202028542171916 0.2936071147407712 0.0 0.0 3.229533154772391</pose>
+      <name>lettuce_02_0209</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.73168641913701 -5.876087337882347 0.2923605684208388 0.0 0.0 5.171667654758154</pose>
+      <name>lettuce_01_0210</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.718676333180235 -5.570985313259307 0.2853620821309904 0.0 0.0 2.2041024794150936</pose>
+      <name>lettuce_01_0211</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.720193720722603 -5.227231721793657 0.28743641287364985 0.0 0.0 0.21030756915923585</pose>
+      <name>lettuce_01_0212</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.685076057180946 -4.919061047436136 0.2891760503415067 0.0 0.0 3.568313580212712</pose>
+      <name>lettuce_01_0213</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.638465183933746 -4.614017473751523 0.278565272059847 0.0 0.0 1.5900598739988523</pose>
+      <name>lettuce_01_0214</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.627231578007566 -4.283735798715782 0.2641508890827416 0.0 0.0 0.5845554384332428</pose>
+      <name>lettuce_02_0215</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.562420966298149 -3.991983727227539 0.26471718854358955 0.0 0.0 3.3209804848089153</pose>
+      <name>lettuce_02_0216</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.494851763171632 -3.6421138401892996 0.26265800368407377 0.0 0.0 1.4212334246724714</pose>
+      <name>lettuce_02_0217</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.443472723596643 -3.3041924669215046 0.26068816024955255 0.0 0.0 0.047296425003557095</pose>
+      <name>lettuce_02_0218</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.361076152959902 -2.9932366584707015 0.26842608338809404 0.0 0.0 1.2936329845958676</pose>
+      <name>lettuce_01_0219</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.300736333559068 -2.6774900125469987 0.25153498352109394 0.0 0.0 1.5285668351235986</pose>
+      <name>lettuce_01_0220</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.189681826117925 -2.4071900875504344 0.2534968427638935 0.0 0.0 4.091837524605791</pose>
+      <name>lettuce_02_0221</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.096475918262677 -2.0687140927995937 0.2392292094846043 0.0 0.0 4.713276021475358</pose>
+      <name>lettuce_01_0222</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.991873220378717 -1.743480165845624 0.24951987183411398 0.0 0.0 1.1416219008497508</pose>
+      <name>lettuce_01_0223</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.885470492552675 -1.432696719022221 0.2700582880438724 0.0 0.0 0.19468096309005462</pose>
+      <name>lettuce_01_0224</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.737208220338526 -1.131206493420607 0.26533479674267857 0.0 0.0 4.023165386644542</pose>
+      <name>lettuce_01_0225</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.646318850911098 -0.8445936198903767 0.2667035820852681 0.0 0.0 4.140798561163773</pose>
+      <name>lettuce_02_0226</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.4955724880080448 -0.5112229032511102 0.2859517075510974 0.0 0.0 3.923506561727994</pose>
+      <name>lettuce_02_0227</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.346451451409977 -0.20380948593872078 0.2885671313222903 0.0 0.0 0.8745438747371398</pose>
+      <name>lettuce_02_0228</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.212208394809571 0.07920103727122747 0.3021272792795848 0.0 0.0 4.397092277806234</pose>
+      <name>lettuce_02_0229</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.057520765351275 0.3545411620783902 0.3045303158872944 0.0 0.0 0.34021143716448266</pose>
+      <name>lettuce_01_0230</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.86906668001829 0.6355759601966728 0.3164820224391911 0.0 0.0 2.460815469643511</pose>
+      <name>lettuce_02_0231</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.7384002967455254 0.888837492596749 0.3174083547204176 0.0 0.0 2.6566001809491304</pose>
+      <name>lettuce_01_0232</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.520904365843225 1.2021680915800161 0.32147789225284423 0.0 0.0 0.17228743703896018</pose>
+      <name>lettuce_02_0233</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.3643837144541378 1.467753045268654 0.3179654683808519 0.0 0.0 4.044588540293126</pose>
+      <name>lettuce_01_0234</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.173372196899395 1.7475046622883454 0.32487134676730806 0.0 0.0 3.945070603850951</pose>
+      <name>lettuce_02_0235</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.9752245316065677 1.9908795428075348 0.31732809482859453 0.0 0.0 3.1667568618323068</pose>
+      <name>lettuce_01_0236</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.757751355767968 2.2861867785062797 0.3153779417959197 0.0 0.0 6.137108802403901</pose>
+      <name>lettuce_02_0237</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.5318970163024919 2.5237291582739703 0.29872105638956176 0.0 0.0 4.156627623513434</pose>
+      <name>lettuce_02_0238</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.3152958103925088 2.767452212830073 0.2892534277310853 0.0 0.0 4.1258384096934275</pose>
+      <name>lettuce_01_0239</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.1104830392793323 3.0060898592559875 0.30552683185096835 0.0 0.0 4.870469126221396</pose>
+      <name>lettuce_02_0240</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.867695444294988 3.231181014763844 0.27832190328623496 0.0 0.0 2.4482810669205244</pose>
+      <name>lettuce_01_0241</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.6440946884313397 3.488613377062296 0.2696729428890157 0.0 0.0 0.05222712311314402</pose>
+      <name>lettuce_02_0242</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.4033436732685411 3.7072265829390423 0.2894368680006776 0.0 0.0 0.49897474701945427</pose>
+      <name>lettuce_01_0243</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.13309373366020089 3.9356015829664495 0.28295835038820194 0.0 0.0 3.2114739439320266</pose>
+      <name>lettuce_02_0244</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.1075545822485429 4.164735437604372 0.2850957200982758 0.0 0.0 1.9796583118354463</pose>
+      <name>lettuce_01_0245</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.31754554187703815 4.405978489076689 0.2743363733037886 0.0 0.0 3.8045574949530225</pose>
+      <name>lettuce_01_0246</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.5545208010447211 4.633707858351857 0.2881491032794236 0.0 0.0 1.88407477590427</pose>
+      <name>lettuce_01_0247</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.736497688391309 4.908873319106678 0.28392456961929985 0.0 0.0 5.171932795976694</pose>
+      <name>lettuce_01_0248</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.9478361472064278 5.180934100072837 0.2911919962456069 0.0 0.0 0.14757182304861033</pose>
+      <name>lettuce_01_0249</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.1073866106617503 5.432104356033361 0.2787069902460923 0.0 0.0 4.6398788478891495</pose>
+      <name>lettuce_01_0250</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.2961646839952026 5.723206810766855 0.28983800860056147 0.0 0.0 0.686283039767873</pose>
+      <name>lettuce_02_0251</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.4482174051042118 5.985543673616232 0.27559578566694143 0.0 0.0 4.13499003361478</pose>
+      <name>lettuce_02_0252</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.5905806558754303 6.309936902333857 0.27110676515756305 0.0 0.0 3.104140321343964</pose>
+      <name>lettuce_01_0253</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.7010250156838829 6.59454621935735 0.25402450729343373 0.0 0.0 0.8451427573934904</pose>
+      <name>lettuce_02_0254</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-1.8077153515916706 6.87490544804282 0.2533538618693762 0.0 0.0 5.049321733093371</pose>
+      <name>lettuce_01_0255</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.9153250196150082 7.183096168607151 0.2763030283846161 0.0 0.0 4.063430836516002</pose>
+      <name>lettuce_02_0256</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-2.0107401905955817 7.497970169909553 0.2678342231286267 0.0 0.0 5.970747451639655</pose>
+      <name>lettuce_02_0257</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>5.7493019102429725 -7.796041270491287 0.32388666792102216 0.0 0.0 2.856845792108689</pose>
+      <name>lettuce_01_0258</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.750433369215284 -7.49534989522931 0.3241712412411077 0.0 0.0 1.2790000752708153</pose>
+      <name>lettuce_02_0259</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>5.725310753154193 -7.18196747397184 0.32253413190980407 0.0 0.0 2.1303051327539255</pose>
+      <name>lettuce_01_0260</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>5.750568061354421 -6.85716849399566 0.321249848658486 0.0 0.0 6.137009457580971</pose>
+      <name>lettuce_01_0261</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.72863892953188 -6.541656139467089 0.3231990483533177 0.0 0.0 3.288974137893386</pose>
+      <name>lettuce_02_0262</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.731762641057734 -6.225402700414729 0.309175667158086 0.0 0.0 6.028978959292214</pose>
+      <name>lettuce_02_0263</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>5.738542609928346 -5.919859613699211 0.3155946754604159 0.0 0.0 4.108661123757555</pose>
+      <name>lettuce_01_0264</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>5.71546722937359 -5.588050467068812 0.30089617511131606 0.0 0.0 4.484688963945896</pose>
+      <name>lettuce_01_0265</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.70869840961577 -5.248600392944032 0.3057592690273754 0.0 0.0 1.2843716994553478</pose>
+      <name>lettuce_02_0266</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.679037780815707 -4.952384397140553 0.2851323325172416 0.0 0.0 0.9791194274024866</pose>
+      <name>lettuce_02_0267</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.642484240260035 -4.601736841365967 0.28323377739958083 0.0 0.0 1.8368471785739702</pose>
+      <name>lettuce_02_0268</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.599210780795647 -4.260788079051714 0.27653429483758746 0.0 0.0 2.3094893607492373</pose>
+      <name>lettuce_02_0269</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>5.566429735096924 -3.9237993915171328 0.26743660380716955 0.0 0.0 2.521825811942687</pose>
+      <name>lettuce_01_0270</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.496276997452147 -3.5908722305463643 0.2719906591715103 0.0 0.0 1.3151246493945639</pose>
+      <name>lettuce_02_0271</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.447026950728788 -3.2739652225806317 0.2654593488712545 0.0 0.0 3.352209123077171</pose>
+      <name>lettuce_02_0272</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>5.376676448127326 -2.9571093966257536 0.2736366189053671 0.0 0.0 0.7176601654269728</pose>
+      <name>lettuce_01_0273</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.295970941979966 -2.621113775427152 0.2757661440483159 0.0 0.0 3.317852972586187</pose>
+      <name>lettuce_02_0274</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.228811908704002 -2.2854742258576906 0.25577733423056254 0.0 0.0 6.0453999583196225</pose>
+      <name>lettuce_02_0275</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.126057903066925 -2.001994637758787 0.2468191597119508 0.0 0.0 2.018601254603943</pose>
+      <name>lettuce_02_0276</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>5.017519384608138 -1.6961553616870446 0.2668399678069281 0.0 0.0 0.24772115617945048</pose>
+      <name>lettuce_02_0277</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.930276970868083 -1.4160282493948626 0.2626721251193184 0.0 0.0 4.698755868347307</pose>
+      <name>lettuce_01_0278</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.802732383038733 -1.084072147668796 0.2521084802078878 0.0 0.0 1.0757173838570326</pose>
+      <name>lettuce_01_0279</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>4.700813438314753 -0.7935605295943693 0.28227097681371444 0.0 0.0 5.242498741548622</pose>
+      <name>lettuce_02_0280</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.59210026565161 -0.4980436975361194 0.2923700429386852 0.0 0.0 2.27610068310844</pose>
+      <name>lettuce_01_0281</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.452161637258068 -0.22333788726616072 0.3002507180388715 0.0 0.0 5.836268078380793</pose>
+      <name>lettuce_01_0282</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.308214122405823 0.09320869626740898 0.2913814355863864 0.0 0.0 1.9783331414274234</pose>
+      <name>lettuce_01_0283</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>4.1617281004525575 0.3986646725516511 0.289743148349562 0.0 0.0 2.643047881979502</pose>
+      <name>lettuce_01_0284</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.9850733429021963 0.6886349400009497 0.29538736298391377 0.0 0.0 5.085467092126914</pose>
+      <name>lettuce_02_0285</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.834170332395648 0.9565254645941714 0.3217988382707399 0.0 0.0 4.904350837906439</pose>
+      <name>lettuce_01_0286</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.685553148163897 1.2536582381522507 0.32574030018612765 0.0 0.0 5.0865237155491005</pose>
+      <name>lettuce_02_0287</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.5049811933612007 1.5487862591826673 0.3379528525007695 0.0 0.0 1.4744651276683534</pose>
+      <name>lettuce_02_0288</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>3.2990805445923455 1.8435765281335244 0.31830696775221706 0.0 0.0 5.407892424970093</pose>
+      <name>lettuce_01_0289</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>3.129436471838134 2.129077884652932 0.3143466537596209 0.0 0.0 2.126590349365636</pose>
+      <name>lettuce_02_0290</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.9283231449764786 2.3831250005902254 0.3221228868366933 0.0 0.0 5.215425406595553</pose>
+      <name>lettuce_02_0291</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.7170555198324235 2.654652141888209 0.31213140515465154 0.0 0.0 3.0992085536708016</pose>
+      <name>lettuce_01_0292</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.542522102404983 2.869716889982368 0.3137584345617127 0.0 0.0 3.0394966844200173</pose>
+      <name>lettuce_01_0293</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>2.3170008354278666 3.1137477712693995 0.29913809252313756 0.0 0.0 1.3249530718686675</pose>
+      <name>lettuce_02_0294</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>2.136019396493216 3.36146299869059 0.29504431722575336 0.0 0.0 4.639322375237835</pose>
+      <name>lettuce_01_0295</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>1.8875005972622596 3.6043789239549815 0.29416152983061233 0.0 0.0 3.8286847682753384</pose>
+      <name>lettuce_01_0296</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.6656597991417208 3.873582472360872 0.30186246814320383 0.0 0.0 6.011009797395926</pose>
+      <name>lettuce_02_0297</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.4362000326077144 4.080553376861542 0.307586369139211 0.0 0.0 4.653218383495898</pose>
+      <name>lettuce_02_0298</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>1.2115841751568885 4.325391732885211 0.292708045403353 0.0 0.0 1.6821806168969407</pose>
+      <name>lettuce_02_0299</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.9626045004430612 4.532552393095398 0.2880186211642869 0.0 0.0 5.486187999521743</pose>
+      <name>lettuce_02_0300</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.7436961195074698 4.752144783220083 0.2863673804396978 0.0 0.0 0.8386280418052319</pose>
+      <name>lettuce_02_0301</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>0.48975799142485704 4.9702837255711385 0.30032931289219905 0.0 0.0 2.999776548957703</pose>
+      <name>lettuce_01_0302</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.2765417497520907 5.202761511093944 0.3046396527649069 0.0 0.0 5.730852510890776</pose>
+      <name>lettuce_02_0303</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>0.04641609189348479 5.491638428698779 0.2922107116709705 0.0 0.0 0.011053566902047052</pose>
+      <name>lettuce_02_0304</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-0.14116923532470144 5.734049117723807 0.3094966666151998 0.0 0.0 2.5417836136932617</pose>
+      <name>lettuce_02_0305</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.33744701688141615 6.045656025973808 0.28815183384130194 0.0 0.0 6.223280269664419</pose>
+      <name>lettuce_01_0306</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.4790328844943675 6.314160463042948 0.29613981832029274 0.0 0.0 3.971235303614747</pose>
+      <name>lettuce_01_0307</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.644830031164729 6.623996778856669 0.2955097188894583 0.0 0.0 4.414632870069658</pose>
+      <name>lettuce_01_0308</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.7597704051975798 6.911339543740767 0.27404633549343776 0.0 0.0 3.963576631360974</pose>
+      <name>lettuce_01_0309</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.856652214120327 7.210438516107126 0.2853367654369248 0.0 0.0 5.701562901245405</pose>
+      <name>lettuce_01_0310</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_01</uri>
+      <pose>-0.9865173792251534 7.518539822178584 0.2769887835071691 0.0 0.0 4.881183049675949</pose>
+      <name>lettuce_01_0311</name>
+      <static>false</static>
+    </include> 
+     
+     
+    <include>
+      <uri>model://lettuce_02</uri>
+      <pose>-1.0810064835019062 7.840248511772374 0.2860432621536796 0.0 0.0 0.7022260995561623</pose>
+      <name>lettuce_02_0312</name>
+      <static>false</static>
+    </include> 
+    </world>
+</sdf>

@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AgileX Bunker Mini with a lidar + camera mount, for RViz and Gazebo Harmonic.
+     base_link (mesh, mass, inertia) comes from bunker/bunker_mini in
+     agilexrobotics/ugv_gazebo_sim (humble). That model is labelled Bunker
+     Mini 2.0 and is a single rigid mesh: the tracks do not move. -->
+<robot name="bunker_mini">
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0.00266149933171387 -6.51753880652126E-06 -0.0988540390646707" rpy="0 0 0" />
+      <mass value="40.9538420525263" />
+      <inertia
+        ixx="0.428867306980697" ixy="-5.34500607982249E-06" ixz="-0.0281290917935353"
+        iyy="1.22745608718324" iyz="-7.8205947442509E-07" izz="1.37929953930289" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://bunker_mini_description/meshes/base_link.STL" />
+      </geometry>
+      <material name="bunker_material">
+        <color rgba="0.25 0.25 0.25 1" />
+      </material>
+    </visual>
+    <!-- The mesh's bounding box in x and y (0.693 x 0.564), but only down to
+         the belly between the tracks (z = -0.19, 8.4 cm above the track
+         bottoms). The upstream box reached the ground; with the hidden track
+         wheels below, that left 3 cm of clearance and the robot grounded on
+         the maize field's bumps. -->
+    <collision>
+      <origin xyz="0.0131 0 -0.0665" rpy="0 0 0" />
+      <geometry>
+        <box size="0.693 0.564 0.247" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Invisible driven wheels standing in for the tracks: three per side
+       along the track centre line (y = +-0.217), all driven like a track.
+       The middle one reaches 5 mm lower and has full grip; the end ones have
+       less grip (see the gazebo blocks), so the robot pivots about its middle
+       when it turns on the spot, as a tracked robot does. -->
+  <link name="left_front_track_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.0" />
+      <inertia ixx="0.003" ixy="0" ixz="0" iyy="0.003" iyz="0" izz="0.005" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.10" length="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_front_track_joint" type="continuous">
+    <origin xyz="0.2 0.217 -0.174" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="left_front_track_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="left_mid_track_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.0" />
+      <inertia ixx="0.003" ixy="0" ixz="0" iyy="0.003" iyz="0" izz="0.005" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.10" length="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_mid_track_joint" type="continuous">
+    <origin xyz="0.0 0.217 -0.179" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="left_mid_track_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="left_rear_track_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.0" />
+      <inertia ixx="0.003" ixy="0" ixz="0" iyy="0.003" iyz="0" izz="0.005" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.10" length="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_rear_track_joint" type="continuous">
+    <origin xyz="-0.2 0.217 -0.174" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="left_rear_track_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="right_front_track_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.0" />
+      <inertia ixx="0.003" ixy="0" ixz="0" iyy="0.003" iyz="0" izz="0.005" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.10" length="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_front_track_joint" type="continuous">
+    <origin xyz="0.2 -0.217 -0.174" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="right_front_track_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="right_mid_track_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.0" />
+      <inertia ixx="0.003" ixy="0" ixz="0" iyy="0.003" iyz="0" izz="0.005" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.10" length="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_mid_track_joint" type="continuous">
+    <origin xyz="0.0 -0.217 -0.179" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="right_mid_track_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="right_rear_track_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.0" />
+      <inertia ixx="0.003" ixy="0" ixz="0" iyy="0.003" iyz="0" izz="0.005" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.10" length="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_rear_track_joint" type="continuous">
+    <origin xyz="-0.2 -0.217 -0.174" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="right_rear_track_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <!-- Lidar + camera mount (Onshape export, onshape-to-robot).
+       In the mounting_plate frame the bracket is 0.27 m wide along X, the
+       camera faces -Y and Z is up. sensor_mount_joint yaws it by 90 deg so the
+       camera faces robot +X, centres it on y=0 and rests the plate on the flat
+       deck between the tracks (z=0; the mesh's highest points, at z=0.057, are
+       small bumps on the track covers). Change the joint x to slide it along
+       the deck. -->
+  <joint name="sensor_mount_joint" type="fixed">
+    <origin xyz="0.145 0.103849 -0.0905" rpy="0 0 1.5708" />
+    <parent link="base_link" />
+    <child link="mounting_plate" />
+  </joint>
+  <link name="mounting_plate">
+    <inertial>
+      <origin xyz="-0.103827 0.0050822 0.16024" rpy="0 0 0" />
+      <mass value="0.36749" />
+      <inertia ixx="0.00134227" ixy="1.03252e-07" ixz="-1.2342e-08" iyy="0.00184516" iyz="-0.000424489" izz="0.00100517" />
+    </inertial>
+    <!-- Part rplidar_c1_1__body1 -->
+    <visual>
+      <origin xyz="-0.103849 0.0303506 0.200463" rpy="1.5708 0 0" />
+      <geometry>
+        <mesh filename="package://bunker_mini_description/meshes/rplidar_c1_1__body1.stl" />
+      </geometry>
+      <material name="rplidar_c1_1__body1_material">
+        <color rgba="0.1 0.1 0.1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.103849 0.0303506 0.2211" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.028" length="0.0413" />
+      </geometry>
+    </collision>
+    <!-- Part realsense_camera -->
+    <visual>
+      <origin xyz="-0.254685 0.920052 0.165463" rpy="1.5708 0 0" />
+      <geometry>
+        <mesh filename="package://bunker_mini_description/meshes/realsense_camera.stl" />
+      </geometry>
+      <material name="realsense_camera_material">
+        <color rgba="0.792157 0.819608 0.933333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.1038 -0.0124 0.1655" rpy="0 0 0" />
+      <geometry>
+        <box size="0.124 0.0261 0.029" />
+      </geometry>
+    </collision>
+    <!-- Part mounting_plate -->
+    <visual>
+      <origin xyz="-0.103849 -0.0233904 0.0904633" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://bunker_mini_description/meshes/mounting_plate.stl" />
+      </geometry>
+      <material name="mounting_plate_material">
+        <color rgba="0.627451 0.627451 0.627451 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.1038 0.0049 0.1455" rpy="0 0 0" />
+      <geometry>
+        <box size="0.27 0.1065 0.11" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Sensor frames (x forward, z up), estimated from the mesh bounding boxes:
+       laser sits on the lidar spin axis about 31 mm above its base,
+       camera_link at the centre of the camera front face. -->
+  <link name="laser" />
+  <joint name="laser_joint" type="fixed">
+    <origin xyz="-0.103849 0.0303506 0.2315" rpy="0 0 -1.5708" />
+    <parent link="mounting_plate" />
+    <child link="laser" />
+  </joint>
+  <link name="camera_link" />
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="-0.103849 -0.0255 0.1655" rpy="0 0 -1.5708" />
+    <parent link="mounting_plate" />
+    <child link="camera_link" />
+  </joint>
+  <!-- ROS optical convention: z forward, x right, y down -->
+  <link name="camera_optical_frame" />
+  <joint name="camera_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+    <parent link="camera_link" />
+    <child link="camera_optical_frame" />
+  </joint>
+
+  <gazebo reference="left_front_track_link">
+    <mu1>0.15</mu1>
+    <mu2>0.15</mu2>
+  </gazebo>
+  <gazebo reference="left_mid_track_link">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+  <gazebo reference="left_rear_track_link">
+    <mu1>0.15</mu1>
+    <mu2>0.15</mu2>
+  </gazebo>
+  <gazebo reference="right_front_track_link">
+    <mu1>0.15</mu1>
+    <mu2>0.15</mu2>
+  </gazebo>
+  <gazebo reference="right_mid_track_link">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+  <gazebo reference="right_rear_track_link">
+    <mu1>0.15</mu1>
+    <mu2>0.15</mu2>
+  </gazebo>
+
+  <!-- Simulated sensors for Gazebo Harmonic (gz sim). They need the
+       gz-sim-sensors-system plugin in the world, see worlds/sensor_test.sdf. -->
+  <!-- RPLidar C1: 360 deg, 10 Hz, 0.05-12 m, 0.72 deg angular resolution -->
+  <gazebo reference="laser">
+    <sensor name="rplidar_c1" type="gpu_lidar">
+      <topic>scan</topic>
+      <gz_frame_id>laser</gz_frame_id>
+      <update_rate>10</update_rate>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>500</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- IMU at base_link, 100 Hz. Gives the row-following MPC a slip-free
+       heading and a tilt reading. -->
+  <gazebo reference="base_link">
+    <sensor name="imu" type="imu">
+      <topic>imu</topic>
+      <gz_frame_id>base_link</gz_frame_id>
+      <update_rate>100</update_rate>
+      <always_on>true</always_on>
+    </sensor>
+  </gazebo>
+
+  <!-- RealSense-style RGB-D camera: 640x480 @ 30 Hz, 69 deg horizontal FOV -->
+  <gazebo reference="camera_link">
+    <sensor name="realsense" type="rgbd_camera">
+      <topic>camera</topic>
+      <!-- Gazebo stamps every topic of this sensor with this frame. That is
+           right for the images and camera_info, but not for the camera/points
+           cloud Gazebo also publishes (it is x-forward), so that one is not
+           bridged to ROS. -->
+      <gz_frame_id>camera_optical_frame</gz_frame_id>
+      <update_rate>30</update_rate>
+      <always_on>true</always_on>
+      <camera>
+        <horizontal_fov>1.2043</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>10.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- Drive for Gazebo Harmonic: differential (skid-steer) drive on the hidden track wheels,
+       commanded on cmd_vel. Replaces the Gazebo Classic planar_move plugin of
+       the upstream file. Limits: Bunker Mini top speed 1.5 m/s. -->
+  <gazebo>
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>left_front_track_joint</left_joint>
+      <left_joint>left_mid_track_joint</left_joint>
+      <left_joint>left_rear_track_joint</left_joint>
+      <right_joint>right_front_track_joint</right_joint>
+      <right_joint>right_mid_track_joint</right_joint>
+      <right_joint>right_rear_track_joint</right_joint>
+      <wheel_separation>0.434</wheel_separation>
+      <wheel_radius>0.10</wheel_radius>
+      <max_linear_velocity>1.5</max_linear_velocity>
+      <min_linear_velocity>-1.5</min_linear_velocity>
+      <max_angular_velocity>2.0</max_angular_velocity>
+      <min_angular_velocity>-2.0</min_angular_velocity>
+      <max_linear_acceleration>2.0</max_linear_acceleration>
+      <min_linear_acceleration>-2.0</min_linear_acceleration>
+      <topic>cmd_vel</topic>
+      <odom_topic>odom</odom_topic>
+      <tf_topic>tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>joint_states</topic>
+    </plugin>
+  </gazebo>
+</robot>

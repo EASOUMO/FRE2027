@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AgileX Ranger Mini (v2) with a lidar + camera mount, for RViz and Gazebo
+     Harmonic. Geometry, masses and joint names follow
+     ranger/ranger_mini/urdf/ranger_mini_gazebo.xacro in
+     agilexrobotics/ugv_gazebo_sim (humble). The visual is one whole-robot
+     mesh on base_link, so the wheels and steering modules are drawn but do
+     not move; the steering and wheel links below are
+     invisible and carry the physics. base_link sits over the centre of the four
+     wheels, 0.117 m above the ground. -->
+<robot name="ranger_mini">
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0.1" rpy="0 0 0" />
+      <mass value="10" />
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1" />
+    </inertial>
+    <!-- base_link.STL here is built from two upstream meshes, already in the
+         base_link frame: the body with its cover panels (ranger_base.dae,
+         109 MB) and the wheels and steering modules (upstream base_link.STL,
+         which has no cover panels), merged and simplified to 82k triangles. -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://ranger_mini_description/meshes/base_link.STL" />
+      </geometry>
+      <material name="ranger_material">
+        <color rgba="0.6 0.6 0.6 1" />
+      </material>
+    </visual>
+    <!-- body above the wheels -->
+    <collision>
+      <origin xyz="0.01 0 0.134" rpy="0 0 0" />
+      <geometry>
+        <box size="0.72 0.46 0.18" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Four independently steered and driven wheels (wheelbase 0.49 m,
+       track 0.37 m, measured from the mesh's wheel contact patches). -->
+  <link name="fl_steering_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
+    </inertial>
+  </link>
+  <joint name="fl_steering_wheel" type="revolute">
+    <origin xyz="0.245 0.185 0.02" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="fl_steering_wheel_link" />
+    <axis xyz="0 0 1" />
+    <limit effort="50" velocity="6.28" lower="-2.1" upper="2.1" />
+  </joint>
+  <link name="fl_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="8" />
+      <inertia ixx="0.1171" ixy="0" ixz="0" iyy="0.1361" iyz="0" izz="0.1171" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0" />
+      <geometry>
+        <cylinder length="0.08" radius="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="fl_wheel" type="continuous">
+    <origin xyz="0 0 -0.057" rpy="0 0 0" />
+    <parent link="fl_steering_wheel_link" />
+    <child link="fl_wheel_link" />
+    <axis xyz="0 1 0" />
+    <limit effort="100" velocity="20" />
+  </joint>
+  <link name="fr_steering_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
+    </inertial>
+  </link>
+  <joint name="fr_steering_wheel" type="revolute">
+    <origin xyz="0.245 -0.185 0.02" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="fr_steering_wheel_link" />
+    <axis xyz="0 0 1" />
+    <limit effort="50" velocity="6.28" lower="-2.1" upper="2.1" />
+  </joint>
+  <link name="fr_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="8" />
+      <inertia ixx="0.1171" ixy="0" ixz="0" iyy="0.1361" iyz="0" izz="0.1171" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0" />
+      <geometry>
+        <cylinder length="0.08" radius="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="fr_wheel" type="continuous">
+    <origin xyz="0 0 -0.057" rpy="0 0 0" />
+    <parent link="fr_steering_wheel_link" />
+    <child link="fr_wheel_link" />
+    <axis xyz="0 1 0" />
+    <limit effort="100" velocity="20" />
+  </joint>
+  <link name="rl_steering_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
+    </inertial>
+  </link>
+  <joint name="rl_steering_wheel" type="revolute">
+    <origin xyz="-0.245 0.185 0.02" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="rl_steering_wheel_link" />
+    <axis xyz="0 0 1" />
+    <limit effort="50" velocity="6.28" lower="-2.1" upper="2.1" />
+  </joint>
+  <link name="rl_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="8" />
+      <inertia ixx="0.1171" ixy="0" ixz="0" iyy="0.1361" iyz="0" izz="0.1171" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0" />
+      <geometry>
+        <cylinder length="0.08" radius="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="rl_wheel" type="continuous">
+    <origin xyz="0 0 -0.057" rpy="0 0 0" />
+    <parent link="rl_steering_wheel_link" />
+    <child link="rl_wheel_link" />
+    <axis xyz="0 1 0" />
+    <limit effort="100" velocity="20" />
+  </joint>
+  <link name="rr_steering_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
+    </inertial>
+  </link>
+  <joint name="rr_steering_wheel" type="revolute">
+    <origin xyz="-0.245 -0.185 0.02" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="rr_steering_wheel_link" />
+    <axis xyz="0 0 1" />
+    <limit effort="50" velocity="6.28" lower="-2.1" upper="2.1" />
+  </joint>
+  <link name="rr_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="8" />
+      <inertia ixx="0.1171" ixy="0" ixz="0" iyy="0.1361" iyz="0" izz="0.1171" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0" />
+      <geometry>
+        <cylinder length="0.08" radius="0.08" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="rr_wheel" type="continuous">
+    <origin xyz="0 0 -0.057" rpy="0 0 0" />
+    <parent link="rr_steering_wheel_link" />
+    <child link="rr_wheel_link" />
+    <axis xyz="0 1 0" />
+    <limit effort="100" velocity="20" />
+  </joint>
+
+  <!-- Lidar + camera mount (Onshape export, onshape-to-robot).
+       In the mounting_plate frame the bracket is 0.27 m wide along X, the
+       camera faces -Y and Z is up. sensor_mount_joint yaws it by 90 deg so the
+       camera faces robot +X, centres it on y=0 and rests the plate on the top
+       deck (z=0.224), with its front edge about 4 cm behind the front of the
+       deck, as on the Hunter SE. Change the joint x to slide it along the deck. -->
+  <joint name="sensor_mount_joint" type="fixed">
+    <origin xyz="0.255 0.103849 0.1335" rpy="0 0 1.5708" />
+    <parent link="base_link" />
+    <child link="mounting_plate" />
+  </joint>
+  <link name="mounting_plate">
+    <inertial>
+      <origin xyz="-0.103827 0.0050822 0.16024" rpy="0 0 0" />
+      <mass value="0.36749" />
+      <inertia ixx="0.00134227" ixy="1.03252e-07" ixz="-1.2342e-08" iyy="0.00184516" iyz="-0.000424489" izz="0.00100517" />
+    </inertial>
+    <!-- Part rplidar_c1_1__body1 -->
+    <visual>
+      <origin xyz="-0.103849 0.0303506 0.200463" rpy="1.5708 0 0" />
+      <geometry>
+        <mesh filename="package://ranger_mini_description/meshes/rplidar_c1_1__body1.stl" />
+      </geometry>
+      <material name="rplidar_c1_1__body1_material">
+        <color rgba="0.1 0.1 0.1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.103849 0.0303506 0.2211" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.028" length="0.0413" />
+      </geometry>
+    </collision>
+    <!-- Part realsense_camera -->
+    <visual>
+      <origin xyz="-0.254685 0.920052 0.165463" rpy="1.5708 0 0" />
+      <geometry>
+        <mesh filename="package://ranger_mini_description/meshes/realsense_camera.stl" />
+      </geometry>
+      <material name="realsense_camera_material">
+        <color rgba="0.792157 0.819608 0.933333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.1038 -0.0124 0.1655" rpy="0 0 0" />
+      <geometry>
+        <box size="0.124 0.0261 0.029" />
+      </geometry>
+    </collision>
+    <!-- Part mounting_plate -->
+    <visual>
+      <origin xyz="-0.103849 -0.0233904 0.0904633" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://ranger_mini_description/meshes/mounting_plate.stl" />
+      </geometry>
+      <material name="mounting_plate_material">
+        <color rgba="0.627451 0.627451 0.627451 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.1038 0.0049 0.1455" rpy="0 0 0" />
+      <geometry>
+        <box size="0.27 0.1065 0.11" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Sensor frames (x forward, z up), estimated from the mesh bounding boxes:
+       laser sits on the lidar spin axis about 31 mm above its base,
+       camera_link at the centre of the camera front face. -->
+  <link name="laser" />
+  <joint name="laser_joint" type="fixed">
+    <origin xyz="-0.103849 0.0303506 0.2315" rpy="0 0 -1.5708" />
+    <parent link="mounting_plate" />
+    <child link="laser" />
+  </joint>
+  <link name="camera_link" />
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="-0.103849 -0.0255 0.1655" rpy="0 0 -1.5708" />
+    <parent link="mounting_plate" />
+    <child link="camera_link" />
+  </joint>
+  <!-- ROS optical convention: z forward, x right, y down -->
+  <link name="camera_optical_frame" />
+  <joint name="camera_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+    <parent link="camera_link" />
+    <child link="camera_optical_frame" />
+  </joint>
+
+  <gazebo reference="fl_wheel_link">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <gazebo reference="fr_wheel_link">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <gazebo reference="rl_wheel_link">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <gazebo reference="rr_wheel_link">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+
+  <!-- Simulated sensors for Gazebo Harmonic (gz sim). They need the
+       gz-sim-sensors-system plugin in the world, see worlds/sensor_test.sdf. -->
+  <!-- RPLidar C1: 360 deg, 10 Hz, 0.05-12 m, 0.72 deg angular resolution -->
+  <gazebo reference="laser">
+    <sensor name="rplidar_c1" type="gpu_lidar">
+      <topic>scan</topic>
+      <gz_frame_id>laser</gz_frame_id>
+      <update_rate>10</update_rate>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>500</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- IMU at base_link, 100 Hz. Gives the row-following MPC a slip-free
+       heading and a tilt reading. -->
+  <gazebo reference="base_link">
+    <sensor name="imu" type="imu">
+      <topic>imu</topic>
+      <gz_frame_id>base_link</gz_frame_id>
+      <update_rate>100</update_rate>
+      <always_on>true</always_on>
+    </sensor>
+  </gazebo>
+
+  <!-- RealSense-style RGB-D camera: 640x480 @ 30 Hz, 69 deg horizontal FOV -->
+  <gazebo reference="camera_link">
+    <sensor name="realsense" type="rgbd_camera">
+      <topic>camera</topic>
+      <!-- Gazebo stamps every topic of this sensor with this frame. That is
+           right for the images and camera_info, but not for the camera/points
+           cloud Gazebo also publishes (it is x-forward), so that one is not
+           bridged to ROS. -->
+      <gz_frame_id>camera_optical_frame</gz_frame_id>
+      <update_rate>30</update_rate>
+      <always_on>true</always_on>
+      <camera>
+        <horizontal_fov>1.2043</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>10.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- Drive for Gazebo Harmonic: one position controller per steering joint and
+       one velocity controller per wheel. scripts/four_ws_controller.py turns
+       cmd_vel into those eight commands. Odometry comes from Gazebo's
+       OdometryPublisher, i.e. from the simulated pose, so it does not drift. -->
+  <gazebo>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>fl_steering_wheel</joint_name>
+      <topic>steering/fl</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <p_gain>8.0</p_gain>
+      <cmd_max>4.0</cmd_max>
+      <cmd_min>-4.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>fl_wheel</joint_name>
+      <topic>wheel/fl</topic>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>fr_steering_wheel</joint_name>
+      <topic>steering/fr</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <p_gain>8.0</p_gain>
+      <cmd_max>4.0</cmd_max>
+      <cmd_min>-4.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>fr_wheel</joint_name>
+      <topic>wheel/fr</topic>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>rl_steering_wheel</joint_name>
+      <topic>steering/rl</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <p_gain>8.0</p_gain>
+      <cmd_max>4.0</cmd_max>
+      <cmd_min>-4.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>rl_wheel</joint_name>
+      <topic>wheel/rl</topic>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>rr_steering_wheel</joint_name>
+      <topic>steering/rr</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <p_gain>8.0</p_gain>
+      <cmd_max>4.0</cmd_max>
+      <cmd_min>-4.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>rr_wheel</joint_name>
+      <topic>wheel/rr</topic>
+    </plugin>
+    <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
+      <odom_frame>odom</odom_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+      <odom_topic>odom</odom_topic>
+      <tf_topic>tf</tf_topic>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <dimensions>2</dimensions>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>joint_states</topic>
+    </plugin>
+  </gazebo>
+</robot>

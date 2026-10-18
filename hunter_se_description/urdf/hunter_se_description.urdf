@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="hunter_se_description">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.0374140021041951 -0.000373005187591258 -0.0771282894414029"
+        rpy="0 0 0" />
+      <mass
+        value="24.73" />
+      <inertia
+        ixx="0.123215829336501"
+        ixy="-2.51201031615063E-06"
+        ixz="0.00480100638469038"
+        iyy="0.219144715482931"
+        iyz="-1.0329581476775E-05"
+        izz="0.313606030126045" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <!-- bounding box of the chassis mesh (see the wheel collisions) -->
+    <collision>
+      <origin xyz="0.0808 0 -0.0905" rpy="0 0 0" />
+      <geometry>
+        <box size="0.7875 0.4618 0.184" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="fr_steer_left_link">
+    <inertial>
+      <origin
+        xyz="-0.0002776492198312 0.0163539773588368 4.97346169803237E-09"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_steer_left_joint"
+    type="revolute">
+    <origin
+      xyz="0.34058 0.24619 -0.1535"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="fr_steer_left_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.69"
+      upper="0.69"
+      effort="100"
+      velocity="2.0" />
+  </joint>
+  <link
+    name="fr_left_link">
+    <inertial>
+      <origin
+        xyz="-3.5837499634539E-10 4.97346158701006E-09 -0.016356334080185"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/fr_left_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <!-- cylinder instead of the 20k-triangle wheel mesh: mesh wheels on the
+         maize field heightmap ran the simulation at 15 % of real time -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.135" length="0.09" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_left_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5708 0 0.016976" />
+    <parent
+      link="fr_steer_left_link" />
+    <child
+      link="fr_left_link" />
+    <axis
+      xyz="0 0 -1" />
+     <dynamics damping="0.0" friction="0.05"/>      
+  </joint>
+  <link
+    name="fr_steer_right_link">
+    <inertial>
+      <origin
+        xyz="0.000274981985673328 -0.0163540222836661 -3.24802407192237E-11"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_steer_right_joint"
+    type="revolute">
+    <origin
+      xyz="0.34219 -0.24619 -0.1535"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="fr_steer_right_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.69"
+      upper="0.69"
+      effort="100"
+      velocity="2.0" />
+  </joint>
+  <link
+    name="fr_right_link">
+    <inertial>
+      <origin
+        xyz="0.00027498198567355 3.24801296969213E-11 -0.0163540222836661"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/fr_right_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <!-- cylinder instead of the 20k-triangle wheel mesh: mesh wheels on the
+         maize field heightmap ran the simulation at 15 % of real time -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.135" length="0.09" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_right_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="fr_steer_right_link" />
+    <child
+      link="fr_right_link" />
+    <axis
+      xyz="0 0 1" />
+    <dynamics damping="0.0" friction="0.05"/>
+  </joint>
+
+  <link
+    name="re_left_link">
+    <inertial>
+      <origin
+        xyz="1.245E-09 1.7252E-06 -0.010284"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/re_left_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.37647 0.37647 0.37647 1" />
+      </material>
+    </visual>
+    <!-- cylinder instead of the 20k-triangle wheel mesh: mesh wheels on the
+         maize field heightmap ran the simulation at 15 % of real time -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.135" length="0.09" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="re_left_joint"
+    type="continuous">
+    <origin
+      xyz="-0.2078 0.252 -0.158"
+      rpy="1.5708 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="re_left_link" />
+    <axis
+      xyz="0 0 -1" />
+    <dynamics damping="0.0" friction="0.05"/>
+  </joint>
+  <link
+    name="re_right_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/re_right_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <!-- cylinder instead of the 20k-triangle wheel mesh: mesh wheels on the
+         maize field heightmap ran the simulation at 15 % of real time -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.135" length="0.09" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="re_right_joint"
+    type="continuous">
+    <origin
+      xyz="-0.2078 -0.252 -0.158"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="re_right_link" />
+    <axis
+      xyz="0 0 1" />
+    <dynamics damping="0.0" friction="0.05"/>
+  </joint>
+
+  <link
+    name="front_steer_link">
+    <inertial>
+      <origin
+        xyz="0.049836 8.1046E-15 0.017912"
+        rpy="0 0 0" />
+      <mass
+        value="0.0049179" />
+      <inertia
+        ixx="1.6846E-07"
+        ixy="7.6396E-23"
+        ixz="-1.0974E-08"
+        iyy="7.549E-07"
+        iyz="-1.8957E-22"
+        izz="7.334E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+      <cylinder length="0.001" radius="0.005"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+      <cylinder length="0.001" radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_steer_joint"
+    type="revolute">
+    <origin
+      xyz="0.40792 -1.1431E-05 -0.085581"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_steer_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.72"
+      upper="0.72"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="rear_wheel_link">
+    <inertial>
+      <origin
+        xyz="-0.02 0.0031269 -0.12735"
+        rpy="0 0 0" />
+      <mass
+        value="0.0049179" />
+      <inertia
+        ixx="1.1821E-06"
+        ixy="9.6965E-13"
+        ixz="-3.1553E-12"
+        iyy="9.5276E-07"
+        iyz="1.2428E-08"
+        izz="1.0913E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+      <cylinder length="0.001" radius="0.005"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+      <cylinder length="0.001" radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="-0.30408 -1.1431E-05 -0.085581"
+      rpy="0.0032313 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="rear_wheel_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  
+  
+  
+
+  <!-- Lidar + camera mount (Onshape export, onshape-to-robot).
+       In the mounting_plate frame the bracket is 0.27 m wide along X, the
+       camera faces -Y and Z is up. sensor_mount_joint yaws it by 90 deg so the
+       camera faces robot +X, centres it on y=0 and rests the plate on the top
+       deck (z=0.0015). Change the joint x to slide the mount along the deck. -->
+  <joint name="sensor_mount_joint" type="fixed">
+    <origin xyz="0.355 0.103849 -0.089" rpy="0 0 1.5708" />
+    <parent link="base_link" />
+    <child link="mounting_plate" />
+  </joint>
+  <link name="mounting_plate">
+    <inertial>
+      <origin xyz="-0.103827 0.0050822 0.16024" rpy="0 0 0" />
+      <mass value="0.36749" />
+      <inertia ixx="0.00134227" ixy="1.03252e-07" ixz="-1.2342e-08" iyy="0.00184516" iyz="-0.000424489" izz="0.00100517" />
+    </inertial>
+    <!-- Part rplidar_c1_1__body1 -->
+    <visual>
+      <origin xyz="-0.103849 0.0303506 0.200463" rpy="1.5708 0 0" />
+      <geometry>
+        <mesh filename="package://hunter_se_description/meshes/rplidar_c1_1__body1.stl" />
+      </geometry>
+      <material name="rplidar_c1_1__body1_material">
+        <color rgba="0.1 0.1 0.1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.103849 0.0303506 0.2211" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.028" length="0.0413" />
+      </geometry>
+    </collision>
+    <!-- Part realsense_camera -->
+    <visual>
+      <origin xyz="-0.254685 0.920052 0.165463" rpy="1.5708 0 0" />
+      <geometry>
+        <mesh filename="package://hunter_se_description/meshes/realsense_camera.stl" />
+      </geometry>
+      <material name="realsense_camera_material">
+        <color rgba="0.792157 0.819608 0.933333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.1038 -0.0124 0.1655" rpy="0 0 0" />
+      <geometry>
+        <box size="0.124 0.0261 0.029" />
+      </geometry>
+    </collision>
+    <!-- Part mounting_plate -->
+    <visual>
+      <origin xyz="-0.103849 -0.0233904 0.0904633" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://hunter_se_description/meshes/mounting_plate.stl" />
+      </geometry>
+      <material name="mounting_plate_material">
+        <color rgba="0.627451 0.627451 0.627451 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.1038 0.0049 0.1455" rpy="0 0 0" />
+      <geometry>
+        <box size="0.27 0.1065 0.11" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Sensor frames (x forward, z up), estimated from the mesh bounding boxes:
+       laser sits on the lidar spin axis about 31 mm above its base,
+       camera_link at the centre of the camera front face. -->
+  <link name="laser" />
+  <joint name="laser_joint" type="fixed">
+    <origin xyz="-0.103849 0.0303506 0.2315" rpy="0 0 -1.5708" />
+    <parent link="mounting_plate" />
+    <child link="laser" />
+  </joint>
+  <link name="camera_link" />
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="-0.103849 -0.0255 0.1655" rpy="0 0 -1.5708" />
+    <parent link="mounting_plate" />
+    <child link="camera_link" />
+  </joint>
+  <!-- ROS optical convention: z forward, x right, y down -->
+  <link name="camera_optical_frame" />
+  <joint name="camera_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+    <parent link="camera_link" />
+    <child link="camera_optical_frame" />
+  </joint>
+
+    <gazebo reference="fr_left_link"> 
+    <mu1>0.8</mu1>
+    <mu2>0.8</mu2>
+    <kp>500000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+      <material>Gazebo/Grey </material>
+      </gazebo>
+  <gazebo reference="fr_right_link"> 
+      <mu1>0.8</mu1>
+    <mu2>0.8</mu2>
+    <kp>500000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+      <material>Gazebo/Grey </material>
+      </gazebo>
+  <gazebo reference="re_left_link"> 
+      <mu1>0.8</mu1>
+    <mu2>10</mu2>
+    <kp>500000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+      <material>Gazebo/Grey </material>
+      </gazebo>
+  <gazebo reference="re_right_link"> 
+      <mu1>0.8</mu1>
+    <mu2>10</mu2>
+    <kp>500000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+      <material>Gazebo/Grey </material>
+      </gazebo>
+
+  <!-- Simulated sensors for Gazebo Harmonic (gz sim). They need the
+       gz-sim-sensors-system plugin in the world, see worlds/sensor_test.sdf. -->
+  <!-- RPLidar C1: 360 deg, 10 Hz, 0.05-12 m, 0.72 deg angular resolution -->
+  <gazebo reference="laser">
+    <sensor name="rplidar_c1" type="gpu_lidar">
+      <topic>scan</topic>
+      <gz_frame_id>laser</gz_frame_id>
+      <update_rate>10</update_rate>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>500</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- IMU at base_link, 100 Hz. Gives the row-following MPC a slip-free
+       heading and a tilt reading. -->
+  <gazebo reference="base_link">
+    <sensor name="imu" type="imu">
+      <topic>imu</topic>
+      <gz_frame_id>base_link</gz_frame_id>
+      <update_rate>100</update_rate>
+      <always_on>true</always_on>
+    </sensor>
+  </gazebo>
+
+  <!-- RealSense-style RGB-D camera: 640x480 @ 30 Hz, 69 deg horizontal FOV -->
+  <gazebo reference="camera_link">
+    <sensor name="realsense" type="rgbd_camera">
+      <topic>camera</topic>
+      <!-- Gazebo stamps every topic of this sensor with this frame. That is
+           right for the images and camera_info, but not for the camera/points
+           cloud Gazebo also publishes (it is x-forward), so that one is not
+           bridged to ROS. -->
+      <gz_frame_id>camera_optical_frame</gz_frame_id>
+      <update_rate>30</update_rate>
+      <always_on>true</always_on>
+      <camera>
+        <horizontal_fov>1.2043</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>10.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- Drive for Gazebo Harmonic (gz sim): rear-wheel drive with front
+       Ackermann steering, commanded on cmd_vel. Replaces the Gazebo Classic
+       gazebo_ros_control plugin of the upstream file. -->
+  <gazebo>
+    <plugin filename="gz-sim-ackermann-steering-system" name="gz::sim::systems::AckermannSteering">
+      <left_joint>re_left_joint</left_joint>
+      <right_joint>re_right_joint</right_joint>
+      <left_steering_joint>fr_steer_left_joint</left_steering_joint>
+      <right_steering_joint>fr_steer_right_joint</right_steering_joint>
+      <kingpin_width>0.49238</kingpin_width>
+      <steering_limit>0.52</steering_limit>
+      <wheel_base>0.548</wheel_base>
+      <wheel_separation>0.504</wheel_separation>
+      <wheel_radius>0.135</wheel_radius>
+      <min_velocity>-4.8</min_velocity>
+      <max_velocity>4.8</max_velocity>
+      <min_acceleration>-3.0</min_acceleration>
+      <max_acceleration>3.0</max_acceleration>
+      <topic>cmd_vel</topic>
+      <odom_topic>odom</odom_topic>
+      <tf_topic>tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>joint_states</topic>
+    </plugin>
+  </gazebo>
+
+</robot>
