@@ -228,9 +228,10 @@ instead:
 ### Everyday Docker commands
 
 Run these on the host, in the repository root. For the CPU setup, add
-`FRE2027_ws_cpu` to `up` (`docker compose up -d FRE2027_ws_cpu`), use
-`docker compose --profile cpu stop` / `down`, and use `FRE2027_ws_cpu` as the
-container name in `docker exec`.
+`FRE2027_ws_cpu` to `up`, `build` and `logs`
+(`docker compose up -d FRE2027_ws_cpu`), use
+`docker compose --profile cpu stop` / `down` / `ps`, and use
+`FRE2027_ws_cpu` as the container name in `docker exec`.
 
 | Command | What it does |
 |---|---|
@@ -240,7 +241,8 @@ container name in `docker exec`.
 | `docker compose down` | Stop and remove the container. Your repository files are kept. |
 | `docker compose ps` | Show whether the container is running. |
 | `docker compose logs -f` | Follow the desktop's log, if the page doesn't load. |
-| `docker exec -it FRE2027_ws bash` | Open a shell in the running container, without the browser. |
+| `docker exec -it FRE2027_ws bash` | Open a shell in the running container, without the browser. GUI programs started from it (Gazebo, RViz) still appear on the web desktop. |
+| `docker image prune` | Delete old, untagged images left behind by rebuilds, to free disk space. |
 
 ### Editing files
 
@@ -284,7 +286,9 @@ PASSWD=my-own-password
 Screen size, frame rate and streaming bitrate are set in the `environment`
 section of `docker-compose.yml` (`DISPLAY_SIZEW`, `DISPLAY_SIZEH`,
 `SELKIES_FRAMERATE`, `SELKIES_VIDEO_BITRATE`). Apply a change with
-`docker compose up -d`.
+`docker compose up -d`. In the CPU setup only `DISPLAY_SIZEW`,
+`DISPLAY_SIZEH`, `DISPLAY_DPI` and `DISPLAY_REFRESH` apply, and noVNC
+resizes the desktop to fit your browser window once connected.
 
 ---
 
@@ -754,6 +758,18 @@ and the machine has no NVIDIA GPU.** Use the CPU setup:
 and the RGB-D camera are rendered in software. Close the Gazebo window with
 `headless:=true` to save a little, or use a machine with an NVIDIA GPU
 (locally or remotely through KasmVNC).
+
+**CPU setup: no terminal on the desktop.** Right-click the desktop
+background and pick **Terminal**. If a window disappeared after being
+minimized, the same menu's **Windows** entry lists it.
+
+**CPU setup: `rosdep install` says the cache is missing or out of date.**
+The CPU image deletes the rosdep cache to stay small. Run `rosdep update`
+once in the container, then `rosdep install` again.
+
+**CPU setup: a package installed with `sudo apt install` is missing a
+feature.** Both images tell apt to skip "recommended" packages to stay
+small. Add `--install-recommends` if you need them.
 
 **http://127.0.0.1:8080 doesn't load.**
 Check `docker compose ps` (it should say `Up`) and
