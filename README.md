@@ -22,6 +22,12 @@ everything after it works the same inside the container.
 If you'd rather install ROS on your own machine, see
 [section 2](#2-native-install-without-docker).
 
+## Demo
+
+<!-- Drag roscon_github.mp4 into GitHub's web editor on this line; GitHub replaces it with a
+     https://github.com/user-attachments/assets/... link, which plays inline. -->
+VIDEO_LINK_HERE
+
 ---
 
 ## Contents
