@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Right-click menu on the desktop background. "Windows" lists the open
+     windows, including minimized ones. -->
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+  <menu id="root-menu" label="FRE2027">
+    <item label="Terminal">
+      <action name="Execute"><command>xfce4-terminal --working-directory=/home/ubuntu/ros2_ws</command></action>
+    </item>
+    <item label="RViz">
+      <action name="Execute"><command>bash -ic rviz2</command></action>
+    </item>
+    <separator />
+    <menu id="client-list-combined-menu" label="Windows" />
+    <separator />
+    <item label="Reload Openbox">
+      <action name="Reconfigure" />
+    </item>
+  </menu>
+</openbox_menu>

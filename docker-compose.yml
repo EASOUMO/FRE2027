@@ -7,7 +7,7 @@
 #     docker compose up -d --build                 build (first time) and start
 #     docker compose down                          stop and remove
 #
-#   Without an NVIDIA GPU (software rendering, TCP-only streaming):
+#   Without an NVIDIA GPU (smaller image, software rendering, noVNC over TCP):
 #     docker compose up -d --build FRE2027_ws_cpu
 #     docker compose --profile cpu down
 #
@@ -17,7 +17,9 @@
 # driver + NVIDIA Container Toolkit (see README.md, section 1).
 #
 # Optional overrides go in a `.env` file next to this one (it is git-ignored):
-#   PASSWD=a-better-password # password of the "ubuntu" account (e.g. for sudo prompts)
+#   PASSWD=a-better-password # GPU service: password of the "ubuntu" account
+#                            # (e.g. for sudo prompts). The CPU service has
+#                            # passwordless sudo.
 #   HOST_BIND=0.0.0.0        # expose to your LAN instead of localhost only
 #                            # (WARNING: there is no login, so anyone on the
 #                            #  network could then use the desktop)
@@ -25,13 +27,9 @@
 #                            # instead of Selkies WebRTC (which needs UDP)
 # =============================================================================
 
-# Settings shared by both services below.
+# Settings shared by both services below. Each service builds its own
+# target of the Dockerfile in this directory (image names must be lowercase).
 x-workspace: &workspace
-  # Build from the Dockerfile in this directory and tag the result locally.
-  # Docker image names must be lowercase. Both services use the same image.
-  build: .
-  image: fre2027-ws:latest
-
   # Web desktop. Bound to localhost by default so the desktop is not
   # reachable from other machines on the network: it has no login.
   ports:
@@ -76,6 +74,10 @@ services:
   FRE2027_ws:
     <<: *workspace
     container_name: FRE2027_ws
+    build:
+      context: .
+      target: gpu
+    image: fre2027-ws:latest
 
     # Give the container access to one NVIDIA GPU.
     deploy:
@@ -97,21 +99,23 @@ services:
       SELKIES_FRAMERATE: 60
       SELKIES_AUDIO_BITRATE: 128000
 
-  # No NVIDIA GPU: OpenGL falls back to software rendering (llvmpipe) on the
-  # CPU, so Gazebo runs slower. Streams with KasmVNC, which uses only the
-  # TCP port 8080 (works through SSH tunnels and firewalls without UDP).
+  # No NVIDIA GPU: a much smaller image based on plain Ubuntu, without any
+  # NVIDIA libraries. OpenGL is rendered in software (llvmpipe) on the CPU,
+  # so Gazebo runs slower. The desktop is streamed with noVNC, which uses
+  # only the TCP port 8080 (works through SSH tunnels and firewalls).
   # Only started when named: `docker compose up -d FRE2027_ws_cpu`.
   FRE2027_ws_cpu:
     <<: *workspace
     container_name: FRE2027_ws_cpu
     profiles: [cpu]
+    build:
+      context: .
+      target: cpu
+    image: fre2027-ws:cpu
+    # Reap processes left behind by Gazebo and ROS nodes.
+    init: true
 
     environment:
       <<: *display
-      KASMVNC_ENABLE: 'true'
-      # Stop the base image from downloading NVIDIA libraries at startup when
-      # the host has an NVIDIA driver: without GPU access they crash the X
-      # server. Any value that is not a real driver version works.
-      NVIDIA_DRIVER_VERSION: none
       # Lower than the GPU service to spare the CPU for Gazebo.
       DISPLAY_REFRESH: 30

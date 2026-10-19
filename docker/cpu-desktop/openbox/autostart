@@ -1,0 +1,2 @@
+# Run by openbox-session when the desktop starts.
+xfce4-terminal --working-directory="$HOME/ros2_ws" &

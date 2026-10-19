@@ -11,3 +11,5 @@ build/
 install/
 log/
 **/__pycache__
+# Demo video (500+ MB)
+*.mp4

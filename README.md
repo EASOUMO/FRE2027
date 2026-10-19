@@ -51,24 +51,26 @@ https://github.com/user-attachments/assets/b1955eea-f626-454f-8ad4-18003cac06b8
 
 The container provides an Ubuntu 24.04 desktop with ROS 2 Jazzy, Gazebo
 Harmonic, `teleop_twist_keyboard` and this workspace already built. You use
-it **in your web browser**
-([docker-nvidia-egl-desktop](https://github.com/selkies-project/docker-nvidia-egl-desktop)).
+it **in your web browser**.
 
 There are two ways to run it. Pick one before you start:
 
-| Setup | Use it when | Gazebo renders on | Desktop streamed with |
-|---|---|---|---|
-| **GPU** (default) | The machine running Docker has an NVIDIA GPU | the GPU | Selkies WebRTC, or KasmVNC if UDP is blocked |
-| **CPU** | No NVIDIA GPU (Intel/AMD graphics, laptops, most cloud VMs) | the CPU (software OpenGL) | KasmVNC |
+| Setup | Use it when | Gazebo renders on | Desktop streamed with | Image size |
+|---|---|---|---|---|
+| **GPU** (default) | The machine running Docker has an NVIDIA GPU | the GPU | Selkies WebRTC, or KasmVNC if UDP is blocked | about 15.5 GB |
+| **CPU** | No NVIDIA GPU (Intel/AMD graphics, laptops, most cloud VMs) | the CPU (software OpenGL) | noVNC | about 4 GB |
 
-The CPU setup runs the same image with the same workspace, but the
+The GPU setup is built on the
+[docker-nvidia-egl-desktop](https://github.com/selkies-project/docker-nvidia-egl-desktop)
+image. The CPU setup uses its own, much smaller image built on plain
+Ubuntu 24.04, without any NVIDIA software, and the same workspace. Its
 simulation is much slower: in the maize field it runs at about 5–10 % of
-real time, with the lidar publishing about once a second instead of
+real time, with the lidar publishing about 1–2 times a second instead of
 10 times. That's enough to try out the robots and develop code, but not for
 timing-sensitive work.
 
-Selkies WebRTC sends the video over **UDP**. KasmVNC uses only the TCP port
-8080, so it also works through firewalls, VPNs and SSH tunnels that block
+Selkies WebRTC sends the video over **UDP**. KasmVNC and noVNC use only the
+TCP port 8080, so they also work through firewalls, VPNs and SSH tunnels that block
 UDP. See [Running on a remote machine](#running-on-a-remote-machine).
 
 ### Step 1: Prepare the host (once per machine)
@@ -79,7 +81,7 @@ You need:
 |---|---|---|
 | Linux with Docker Engine and the Compose plugin ([install guide](https://docs.docker.com/engine/install/ubuntu/)) | both | `docker compose version` |
 | Docker usable without `sudo` | both | `docker run --rm hello-world` |
-| About 30 GB of free disk space (the built image alone is about 19 GB) | both | `df -h /var/lib/docker` |
+| Free disk space: about 30 GB for the GPU setup, about 8 GB for the CPU setup | both | `df -h /var/lib/docker` |
 | An NVIDIA GPU and its driver | GPU only | `nvidia-smi` lists your GPU |
 | [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) | GPU only | `docker info \| grep -i runtimes` lists `nvidia` |
 
@@ -107,13 +109,15 @@ cd FRE2027
 
 ### Step 3: Build the image and start the container
 
-Both setups use the **same image**, `fre2027-ws:latest`, built from the
-`Dockerfile` in the repository root. They differ only in how the container
-is started. The build:
+Each setup has its own image, built from a different target of the
+`Dockerfile` in the repository root: `fre2027-ws:latest` (GPU, target `gpu`)
+and `fre2027-ws:cpu` (CPU, target `cpu`). The build:
 
-1. pulls the desktop base image (`ghcr.io/selkies-project/nvidia-egl-desktop`, about 12.5 GB on disk),
-2. installs ROS 2 Jazzy, Gazebo Harmonic, `ros-dev-tools` and `teleop_twist_keyboard`,
-3. installs the packages' dependencies with `rosdep`,
+1. starts from the base image: `ghcr.io/selkies-project/nvidia-egl-desktop`
+   (GPU, about 12.5 GB on disk) or `ubuntu:24.04` (CPU) plus a small
+   TigerVNC + noVNC + Openbox desktop,
+2. installs ROS 2 Jazzy (`ros-base`, RViz), colcon, rosdep and `teleop_twist_keyboard`,
+3. installs the packages' dependencies with `rosdep`, including Gazebo Harmonic,
 4. copies the repository into `/home/ubuntu/ros2_ws/src` and builds it with
    `colcon build --symlink-install`.
 
@@ -127,12 +131,14 @@ docker compose up -d --build FRE2027_ws_cpu   # CPU setup
 ```
 
 The first build takes roughly 10–30 minutes, depending on your connection,
-and the finished image takes about 19 GB. Later starts take seconds.
+and the finished image takes about 15.5 GB (GPU) or 4 GB (CPU). Later
+starts take seconds.
 
 To only build the image, without starting anything:
 
 ```bash
-docker compose build
+docker compose build                  # GPU setup
+docker compose build FRE2027_ws_cpu   # CPU setup
 ```
 
 Check that the container is running:
@@ -163,8 +169,10 @@ part is redone.
 Open **http://127.0.0.1:8080** in your web browser; no login is needed.
 If Docker runs on another machine, see
 [Running on a remote machine](#running-on-a-remote-machine) first.
-On the desktop, open a terminal (**Konsole**, in the application menu at
-the bottom left).
+On the desktop, open a terminal: in the GPU setup, **Konsole** in the
+application menu at the bottom left. The CPU setup opens one when it starts;
+for more, **right-click the desktop background** and pick **Terminal**. That
+menu's **Windows** entry brings back minimized windows.
 
 Every new terminal in the container already has ROS and the workspace
 sourced. The workspace is in `/home/ubuntu/ros2_ws`, and this repository is
@@ -207,7 +215,7 @@ Keep that SSH session open and browse to **http://127.0.0.1:8080** on your
 own computer.
 
 The SSH tunnel only carries TCP, so Selkies WebRTC's UDP video can't go
-through it, and the page loads but never shows the desktop. Use KasmVNC
+through it, and the page loads but never shows the desktop. Use KasmVNC or noVNC
 instead:
 
 - **Remote machine has an NVIDIA GPU:** use the GPU setup with KasmVNC. Put
@@ -215,7 +223,7 @@ instead:
   remote machine, then run `docker compose up -d`. Gazebo still renders on
   the GPU at full speed; only the desktop video changes.
 - **No NVIDIA GPU:** use the CPU setup (`docker compose up -d FRE2027_ws_cpu`).
-  It always uses KasmVNC.
+  It always uses noVNC.
 
 ### Everyday Docker commands
 
@@ -263,9 +271,9 @@ excluded from the image by `.dockerignore`; don't commit it.
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `PASSWD` | `fre2027` | Password of the `ubuntu` account inside the container, for when a program asks for it. |
+| `PASSWD` | `fre2027` | GPU setup: password of the `ubuntu` account inside the container, for when a program asks for it. CPU setup: `sudo` needs no password; `PASSWD` is only used as the desktop password when `SELKIES_ENABLE_BASIC_AUTH=true` (VNC uses only its first 8 characters). |
 | `HOST_BIND` | `127.0.0.1` | Address the desktop listens on. With the default, only this computer can open it. `0.0.0.0` opens it to your network, but **the desktop has no login**, so first set `SELKIES_ENABLE_BASIC_AUTH=true` in `docker-compose.yml`. To reach it from another computer, an SSH tunnel is safer (see [Running on a remote machine](#running-on-a-remote-machine)). |
-| `KASMVNC_ENABLE` | `false` | GPU setup only. `true` streams the desktop with KasmVNC over TCP instead of Selkies WebRTC, which needs UDP. The CPU setup always uses KasmVNC. |
+| `KASMVNC_ENABLE` | `false` | GPU setup only. `true` streams the desktop with KasmVNC over TCP instead of Selkies WebRTC, which needs UDP. The CPU setup always uses noVNC. |
 
 Example `.env`:
 
