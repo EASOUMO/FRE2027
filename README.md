@@ -51,21 +51,37 @@ https://github.com/user-attachments/assets/b1955eea-f626-454f-8ad4-18003cac06b8
 
 The container provides an Ubuntu 24.04 desktop with ROS 2 Jazzy, Gazebo
 Harmonic, `teleop_twist_keyboard` and this workspace already built. You use
-it **in your web browser**. Gazebo renders on your NVIDIA GPU, and the GPU
-also encodes the video stream
-([Selkies](https://github.com/selkies-project/docker-nvidia-egl-desktop)).
+it **in your web browser**
+([docker-nvidia-egl-desktop](https://github.com/selkies-project/docker-nvidia-egl-desktop)).
+
+There are two ways to run it. Pick one before you start:
+
+| Setup | Use it when | Gazebo renders on | Desktop streamed with |
+|---|---|---|---|
+| **GPU** (default) | The machine running Docker has an NVIDIA GPU | the GPU | Selkies WebRTC, or KasmVNC if UDP is blocked |
+| **CPU** | No NVIDIA GPU (Intel/AMD graphics, laptops, most cloud VMs) | the CPU (software OpenGL) | KasmVNC |
+
+The CPU setup runs the same image with the same workspace, but the
+simulation is much slower: in the maize field it runs at about 5–10 % of
+real time, with the lidar publishing about once a second instead of
+10 times. That's enough to try out the robots and develop code, but not for
+timing-sensitive work.
+
+Selkies WebRTC sends the video over **UDP**. KasmVNC uses only the TCP port
+8080, so it also works through firewalls, VPNs and SSH tunnels that block
+UDP. See [Running on a remote machine](#running-on-a-remote-machine).
 
 ### Step 1: Prepare the host (once per machine)
 
 You need:
 
-| Requirement | Check that it works |
-|---|---|
-| Linux with an NVIDIA GPU and its driver | `nvidia-smi` lists your GPU |
-| Docker Engine and the Compose plugin ([install guide](https://docs.docker.com/engine/install/ubuntu/)) | `docker compose version` |
-| Docker usable without `sudo` | `docker run --rm hello-world` |
-| [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) | `docker info \| grep -i runtimes` lists `nvidia` |
-| About 20 GB of free disk space | `df -h ~` |
+| Requirement | Setup | Check that it works |
+|---|---|---|
+| Linux with Docker Engine and the Compose plugin ([install guide](https://docs.docker.com/engine/install/ubuntu/)) | both | `docker compose version` |
+| Docker usable without `sudo` | both | `docker run --rm hello-world` |
+| About 20 GB of free disk space | both | `df -h ~` |
+| An NVIDIA GPU and its driver | GPU only | `nvidia-smi` lists your GPU |
+| [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) | GPU only | `docker info \| grep -i runtimes` lists `nvidia` |
 
 To use Docker without `sudo`, add yourself to the `docker` group, then log
 out and back in:
@@ -74,7 +90,8 @@ out and back in:
 sudo usermod -aG docker $USER
 ```
 
-After installing the NVIDIA Container Toolkit, register it with Docker:
+For the GPU setup, after installing the NVIDIA Container Toolkit, register
+it with Docker:
 
 ```bash
 sudo nvidia-ctk runtime configure --runtime=docker
@@ -94,7 +111,8 @@ Run this in the repository root, the folder that contains
 `docker-compose.yml`:
 
 ```bash
-docker compose up -d --build
+docker compose up -d --build                  # GPU setup
+docker compose up -d --build FRE2027_ws_cpu   # CPU setup
 ```
 
 The first build downloads the desktop base image and ROS, which takes
@@ -108,6 +126,8 @@ docker compose ps        # STATUS should be "Up"
 ### Step 4: Open the desktop
 
 Open **http://127.0.0.1:8080** in your web browser; no login is needed.
+If Docker runs on another machine, see
+[Running on a remote machine](#running-on-a-remote-machine) first.
 On the desktop, open a terminal (**Konsole**, in the application menu at
 the bottom left).
 
@@ -138,9 +158,36 @@ the keys.
 You're set up. Every command from [section 3](#3-running-the-simulation)
 onwards runs in a container terminal like this one.
 
+### Running on a remote machine
+
+If Docker runs on a server or workstation that you reach over the network,
+don't open port 8080 to the network: the desktop has no login. Forward it
+through SSH instead. On **your own computer**:
+
+```bash
+ssh -L 8080:127.0.0.1:8080 user@remote-machine
+```
+
+Keep that SSH session open and browse to **http://127.0.0.1:8080** on your
+own computer.
+
+The SSH tunnel only carries TCP, so Selkies WebRTC's UDP video can't go
+through it, and the page loads but never shows the desktop. Use KasmVNC
+instead:
+
+- **Remote machine has an NVIDIA GPU:** use the GPU setup with KasmVNC. Put
+  `KASMVNC_ENABLE=true` in a `.env` file next to `docker-compose.yml` on the
+  remote machine, then run `docker compose up -d`. Gazebo still renders on
+  the GPU at full speed; only the desktop video changes.
+- **No NVIDIA GPU:** use the CPU setup (`docker compose up -d FRE2027_ws_cpu`).
+  It always uses KasmVNC.
+
 ### Everyday Docker commands
 
-Run these on the host, in the repository root:
+Run these on the host, in the repository root. For the CPU setup, add
+`FRE2027_ws_cpu` to `up` (`docker compose up -d FRE2027_ws_cpu`), use
+`docker compose --profile cpu stop` / `down`, and use `FRE2027_ws_cpu` as the
+container name in `docker exec`.
 
 | Command | What it does |
 |---|---|
@@ -182,7 +229,8 @@ excluded from the image by `.dockerignore`; don't commit it.
 | Variable | Default | Meaning |
 |---|---|---|
 | `PASSWD` | `fre2027` | Password of the `ubuntu` account inside the container, for when a program asks for it. |
-| `HOST_BIND` | `127.0.0.1` | Address the desktop listens on. With the default, only this computer can open it. `0.0.0.0` opens it to your network, but **the desktop has no login**, so first set `SELKIES_ENABLE_BASIC_AUTH=true` in `docker-compose.yml`. |
+| `HOST_BIND` | `127.0.0.1` | Address the desktop listens on. With the default, only this computer can open it. `0.0.0.0` opens it to your network, but **the desktop has no login**, so first set `SELKIES_ENABLE_BASIC_AUTH=true` in `docker-compose.yml`. To reach it from another computer, an SSH tunnel is safer (see [Running on a remote machine](#running-on-a-remote-machine)). |
+| `KASMVNC_ENABLE` | `false` | GPU setup only. `true` streams the desktop with KasmVNC over TCP instead of Selkies WebRTC, which needs UDP. The CPU setup always uses KasmVNC. |
 
 Example `.env`:
 
@@ -647,6 +695,22 @@ then check that `docker info | grep -i runtimes` lists `nvidia`.
 **`permission denied while trying to connect to the Docker daemon socket`.**
 Your user isn't in the `docker` group. Run `sudo usermod -aG docker $USER`,
 then log out and back in.
+
+**The page at http://127.0.0.1:8080 loads, but the desktop never appears**
+(it stays black or keeps saying it is connecting). Selkies WebRTC can't get
+its UDP video through, which is typical over SSH tunnels, VPNs and strict
+firewalls. Set `KASMVNC_ENABLE=true` in `.env` and run `docker compose up -d`,
+or use the CPU setup. See
+[Running on a remote machine](#running-on-a-remote-machine).
+
+**`docker compose up` fails with `could not select device driver "nvidia"`
+and the machine has no NVIDIA GPU.** Use the CPU setup:
+`docker compose up -d --build FRE2027_ws_cpu`.
+
+**The CPU setup is very slow.** That's expected: without a GPU, the lidar
+and the RGB-D camera are rendered in software. Close the Gazebo window with
+`headless:=true` to save a little, or use a machine with an NVIDIA GPU
+(locally or remotely through KasmVNC).
 
 **http://127.0.0.1:8080 doesn't load.**
 Check `docker compose ps` (it should say `Up`) and

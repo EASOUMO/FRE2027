@@ -2,40 +2,82 @@
 # Runs the ROS 2 workspace container with a browser-accessible desktop.
 #
 # Run these commands from the repository root (the directory containing this file):
-#   docker compose up -d --build     build the image (first time) and start
-#   docker compose down              stop and remove the container
+#
+#   With an NVIDIA GPU (default):
+#     docker compose up -d --build                 build (first time) and start
+#     docker compose down                          stop and remove
+#
+#   Without an NVIDIA GPU (software rendering, TCP-only streaming):
+#     docker compose up -d --build FRE2027_ws_cpu
+#     docker compose --profile cpu down
+#
 # Then open http://127.0.0.1:8080 (no login required).
 #
-# Requirements on the host: NVIDIA driver + NVIDIA Container Toolkit
-# (see README.md, "Docker Usage").
+# Requirements on the host: Docker, plus for the default service the NVIDIA
+# driver + NVIDIA Container Toolkit (see README.md, section 1).
 #
 # Optional overrides go in a `.env` file next to this one (it is git-ignored):
 #   PASSWD=a-better-password # password of the "ubuntu" account (e.g. for sudo prompts)
 #   HOST_BIND=0.0.0.0        # expose to your LAN instead of localhost only
 #                            # (WARNING: there is no login, so anyone on the
 #                            #  network could then use the desktop)
+#   KASMVNC_ENABLE=true      # GPU service only: stream with KasmVNC over TCP
+#                            # instead of Selkies WebRTC (which needs UDP)
 # =============================================================================
 
+# Settings shared by both services below.
+x-workspace: &workspace
+  # Build from the Dockerfile in this directory and tag the result locally.
+  # Docker image names must be lowercase. Both services use the same image.
+  build: .
+  image: fre2027-ws:latest
+
+  # Web desktop. Bound to localhost by default so the desktop is not
+  # reachable from other machines on the network: it has no login.
+  ports:
+    - '${HOST_BIND:-127.0.0.1}:8080:8080'
+
+  # Keep STDIN open and allocate a TTY (allows `docker attach`).
+  stdin_open: true
+  tty: true
+
+  # Shared memory for the desktop, browser streaming and Gazebo / DDS.
+  # The Docker default (64 MB) is far too small.
+  shm_size: '2gb'
+
+  volumes:
+    # Mount this repository over the workspace src/ so edits made on the
+    # host or in the container persist and are visible on both sides.
+    # Relative path: works on any machine without editing.
+    - './:/home/ubuntu/ros2_ws/src'
+    # Use the host's timezone inside the container.
+    - '/etc/timezone:/etc/timezone:ro'
+    - '/etc/localtime:/etc/localtime:ro'
+
+x-display: &display
+  # Virtual display settings.
+  DISPLAY_SIZEW: 1920
+  DISPLAY_SIZEH: 1080
+  DISPLAY_REFRESH: 60
+  DISPLAY_DPI: 96
+  DISPLAY_CDEPTH: 24
+  # Password of the Linux account "ubuntu" inside the container. Not
+  # needed to open the web desktop (login is disabled below).
+  PASSWD: ${PASSWD:-fre2027}
+  SELKIES_ENABLE_RESIZE: 'false'
+  # No username/password prompt in the browser. Safe only while the port
+  # is bound to 127.0.0.1 (see `ports` above); set this back to true if
+  # you expose the desktop to a network.
+  SELKIES_ENABLE_BASIC_AUTH: 'false'
+  SELKIES_ENABLE_HTTPS: 'false'
+
 services:
+  # Default: NVIDIA GPU for rendering, Gazebo and hardware video encoding.
   FRE2027_ws:
+    <<: *workspace
     container_name: FRE2027_ws
 
-    # Build from the Dockerfile in this directory and tag the result locally.
-    # Docker image names must be lowercase.
-    build: .
-    image: fre2027-ws:latest
-
-    # Selkies web desktop. Bound to localhost by default so the desktop is
-    # not reachable from other machines on the network: it has no login.
-    ports:
-      - '${HOST_BIND:-127.0.0.1}:8080:8080'
-
-    # Keep STDIN open and allocate a TTY (allows `docker attach`).
-    stdin_open: true
-    tty: true
-
-    # Give the container access to one NVIDIA GPU (for rendering, Gazebo and
-    # hardware video encoding).
+    # Give the container access to one NVIDIA GPU.
     deploy:
       resources:
         reservations:
@@ -44,37 +86,32 @@ services:
               count: 1
               capabilities: [gpu]
 
-    # Shared memory for the desktop, browser streaming and Gazebo / DDS.
-    # The Docker default (64 MB) is far too small.
-    shm_size: '2gb'
+    environment:
+      <<: *display
+      # Streaming: Selkies WebRTC with the NVIDIA hardware H.264 encoder.
+      # WebRTC needs UDP between browser and host; if that is blocked, set
+      # KASMVNC_ENABLE=true in .env to stream over TCP instead.
+      KASMVNC_ENABLE: ${KASMVNC_ENABLE:-false}
+      SELKIES_ENCODER: nvh264enc
+      SELKIES_VIDEO_BITRATE: 8000
+      SELKIES_FRAMERATE: 60
+      SELKIES_AUDIO_BITRATE: 128000
 
-    volumes:
-      # Mount this repository over the workspace src/ so edits made on the
-      # host or in the container persist and are visible on both sides.
-      # Relative path: works on any machine without editing.
-      - './:/home/ubuntu/ros2_ws/src'
-      # Use the host's timezone inside the container.
-      - '/etc/timezone:/etc/timezone:ro'
-      - '/etc/localtime:/etc/localtime:ro'
+  # No NVIDIA GPU: OpenGL falls back to software rendering (llvmpipe) on the
+  # CPU, so Gazebo runs slower. Streams with KasmVNC, which uses only the
+  # TCP port 8080 (works through SSH tunnels and firewalls without UDP).
+  # Only started when named: `docker compose up -d FRE2027_ws_cpu`.
+  FRE2027_ws_cpu:
+    <<: *workspace
+    container_name: FRE2027_ws_cpu
+    profiles: [cpu]
 
     environment:
-      # Virtual display settings.
-      - DISPLAY_SIZEW=1920
-      - DISPLAY_SIZEH=1080
-      - DISPLAY_REFRESH=60
-      - DISPLAY_DPI=96
-      - DISPLAY_CDEPTH=24
-      # Password of the Linux account "ubuntu" inside the container. Not
-      # needed to open the web desktop (login is disabled below).
-      - PASSWD=${PASSWD:-fre2027}
-      # Streaming: NVIDIA hardware H.264 encoder.
-      - SELKIES_ENCODER=nvh264enc
-      - SELKIES_ENABLE_RESIZE=false
-      - SELKIES_VIDEO_BITRATE=8000
-      - SELKIES_FRAMERATE=60
-      - SELKIES_AUDIO_BITRATE=128000
-      # No username/password prompt in the browser. Safe only while the port
-      # is bound to 127.0.0.1 (see `ports` above); set this back to true if
-      # you expose the desktop to a network.
-      - SELKIES_ENABLE_BASIC_AUTH=false
-      - SELKIES_ENABLE_HTTPS=false
+      <<: *display
+      KASMVNC_ENABLE: 'true'
+      # Stop the base image from downloading NVIDIA libraries at startup when
+      # the host has an NVIDIA driver: without GPU access they crash the X
+      # server. Any value that is not a real driver version works.
+      NVIDIA_DRIVER_VERSION: none
+      # Lower than the GPU service to spare the CPU for Gazebo.
+      DISPLAY_REFRESH: 30
