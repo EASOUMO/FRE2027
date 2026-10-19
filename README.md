@@ -1,27 +1,39 @@
 # FRE2027
 
 Simulation of three AgileX field robots for the Field Robot Event 2027, built
-for **ROS 2 Jazzy** and **Gazebo Harmonic** (`gz sim`). Each robot carries the
-same sensor mount (an RPLidar C1 lidar, a RealSense-style RGB-D camera, and an
-IMU), so code written against one robot's topics works on the others.
+on **ROS 2 Jazzy** and **Gazebo Harmonic** (`gz sim`).
 
-There are three crop fields (maize, tomato, lettuce) made with
-[`virtual_maize_field`](https://github.com/FieldRobotEvent/virtual_maize_field),
-plus a small flat world for checking the sensors. Any robot can be started in
-any world with a single launch command.
+- **Three robots**: Hunter SE (car-like steering), Bunker Mini (tracked) and
+  Ranger Mini (four-wheel steering). Each carries the same sensor mount (an
+  RPLidar C1 lidar, a RealSense-style RGB-D camera, and an IMU) and
+  publishes the same ROS topics, so code written for one robot runs on the
+  others.
+- **Four worlds**: maize, tomato and lettuce fields made with
+  [`virtual_maize_field`](https://github.com/FieldRobotEvent/virtual_maize_field),
+  plus a flat world for checking the sensors.
+- **One command** starts any robot in any world. The robots are driven
+  with the standard `teleop_twist_keyboard`, or with your own code on
+  `/cmd_vel`.
+
+**Recommended setup: Docker.** The container comes with ROS, Gazebo and
+this workspace ready to use, on a desktop that opens in your web browser.
+Follow [section 1](#1-getting-started-with-docker-recommended) first, then
+everything after it works the same inside the container.
+If you'd rather install ROS on your own machine, see
+[section 2](#2-native-install-without-docker).
 
 ---
 
 ## Contents
 
-1. [Packages](#1-packages)
-2. [The robots](#2-the-robots)
-3. [The worlds](#3-the-worlds)
-4. [Requirements](#4-requirements)
-5. [Install and build](#5-install-and-build)
-6. [Quick start](#6-quick-start)
-7. [Launch files and arguments](#7-launch-files-and-arguments)
-8. [Driving the robots (teleoperation)](#8-driving-the-robots-teleoperation)
+1. [Getting started with Docker (recommended)](#1-getting-started-with-docker-recommended)
+2. [Native install (without Docker)](#2-native-install-without-docker)
+3. [Running the simulation](#3-running-the-simulation)
+4. [Driving the robots (teleoperation)](#4-driving-the-robots-teleoperation)
+5. [Launch files and arguments](#5-launch-files-and-arguments)
+6. [Packages](#6-packages)
+7. [The robots](#7-the-robots)
+8. [The worlds](#8-the-worlds)
 9. [Topics, frames and sensors](#9-topics-frames-and-sensors)
 10. [Using a newly generated field](#10-using-a-newly-generated-field)
 11. [Troubleshooting](#11-troubleshooting)
@@ -29,72 +41,166 @@ any world with a single launch command.
 
 ---
 
-## 1. Packages
+## 1. Getting started with Docker (recommended)
 
-| Package | What it contains |
+The container provides an Ubuntu 24.04 desktop with ROS 2 Jazzy, Gazebo
+Harmonic, `teleop_twist_keyboard` and this workspace already built. You use
+it **in your web browser**. Gazebo renders on your NVIDIA GPU, and the GPU
+also encodes the video stream
+([Selkies](https://github.com/selkies-project/docker-nvidia-egl-desktop)).
+
+### Step 1: Prepare the host (once per machine)
+
+You need:
+
+| Requirement | Check that it works |
 |---|---|
-| `hunter_se_description` | The **Hunter SE** robot, **plus the three field worlds and all their plant and terrain models**. The other two packages load their fields from here, so it is always required. |
-| `bunker_mini_description` | The **Bunker Mini** robot: URDF, meshes, Gazebo bridge config, RViz configs and launch files. |
-| `ranger_mini_description` | The **Ranger Mini** robot: the same files, plus `four_ws_controller.py`, which turns `cmd_vel` into steering angles and wheel speeds. |
+| Linux with an NVIDIA GPU and its driver | `nvidia-smi` lists your GPU |
+| Docker Engine and the Compose plugin ([install guide](https://docs.docker.com/engine/install/ubuntu/)) | `docker compose version` |
+| Docker usable without `sudo` | `docker run --rm hello-world` |
+| [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) | `docker info \| grep -i runtimes` lists `nvidia` |
+| About 20 GB of free disk space | `df -h ~` |
 
-All three are `ament_cmake` packages that install their files only; nothing is
-compiled.
+To use Docker without `sudo`, add yourself to the `docker` group, then log
+out and back in:
 
-## 2. The robots
+```bash
+sudo usermod -aG docker $USER
+```
 
-| | Hunter SE | Bunker Mini | Ranger Mini |
-|---|---|---|---|
-| Drive type | Ackermann (car-like): rear-wheel drive, front steering | Tracked, skid-steer | Four-wheel independent steering |
-| What executes `cmd_vel` | Gazebo `AckermannSteering` plugin | Gazebo `DiffDrive` plugin | `four_ws_controller.py` node → Gazebo joint controllers |
-| Can turn on the spot | no (steering limit 0.52 rad, 30°) | yes | yes |
-| Can move sideways (`linear.y`) | no | no | yes (crab mode) |
-| Speed limit in the model | 4.8 m/s | 1.5 m/s, 2.0 rad/s | 1.5 m/s at any wheel |
-| Gazebo model name | `hunter_se` | `bunker_mini` | `ranger_mini` |
-| URDF | `urdf/hunter_se_description.urdf` | `urdf/bunker_mini.urdf` | `urdf/ranger_mini.urdf` |
+After installing the NVIDIA Container Toolkit, register it with Docker:
 
-Modelling notes:
+```bash
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+```
 
-- **Bunker Mini:** the body is a single rigid mesh, so the tracks are drawn
-  but don't move. Six hidden wheels (three per side) stand in for the tracks.
-  The middle pair grips fully and the end pairs grip less, so the robot
-  pivots about its centre the way a tracked robot does.
-- **Ranger Mini:** the visual is one whole-robot mesh as well. The four
-  steering modules and wheels underneath are hidden links that carry the
-  physics.
-- **Sensor mount:** the same mount (Onshape export) is fixed to the top
-  deck of every robot. It holds the lidar, with the camera on the front
-  facing forward.
+### Step 2: Clone the repository
 
-## 3. The worlds
+```bash
+git clone https://github.com/EASOUMO/FRE2027.git
+cd FRE2027
+```
 
-| World file | Rows | Notes |
+### Step 3: Build the image and start the container
+
+Run this in the repository root, the folder that contains
+`docker-compose.yml`:
+
+```bash
+docker compose up -d --build
+```
+
+The first build downloads the desktop base image and ROS, which takes
+roughly 10–30 minutes depending on your connection. Later starts take
+seconds. Check that the container is running:
+
+```bash
+docker compose ps        # STATUS should be "Up"
+```
+
+### Step 4: Open the desktop
+
+Open **http://127.0.0.1:8080** in your web browser; no login is needed.
+On the desktop, open a terminal (**Konsole**, in the application menu at
+the bottom left).
+
+Every new terminal in the container already has ROS and the workspace
+sourced. The workspace is in `/home/ubuntu/ros2_ws`, and this repository is
+at `/home/ubuntu/ros2_ws/src`.
+
+### Step 5: Run your first simulation
+
+In the container terminal:
+
+```bash
+ros2 launch bunker_mini_description maize_field.launch.py
+```
+
+Gazebo opens with the Bunker Mini at the start of the maize field. Open a
+**second terminal** and start the keyboard teleop:
+
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+With that terminal focused, press `i` to drive forward, `j` / `l` to turn
+and `k` to stop. Each key is pressed **once**: the robot keeps going until
+the next key. See [section 4](#4-driving-the-robots-teleoperation) for all
+the keys.
+
+You're set up. Every command from [section 3](#3-running-the-simulation)
+onwards runs in a container terminal like this one.
+
+### Everyday Docker commands
+
+Run these on the host, in the repository root:
+
+| Command | What it does |
+|---|---|
+| `docker compose up -d` | Start the container; it reuses the image if already built. |
+| `docker compose up -d --build` | Rebuild the image, then start. Needed after changing a `package.xml`, the `Dockerfile` or `docker-compose.yml`. |
+| `docker compose stop` | Stop the container and keep it, including anything built inside. |
+| `docker compose down` | Stop and remove the container. Your repository files are kept. |
+| `docker compose ps` | Show whether the container is running. |
+| `docker compose logs -f` | Follow the desktop's log, if the page doesn't load. |
+| `docker exec -it FRE2027_ws bash` | Open a shell in the running container, without the browser. |
+
+### Editing files
+
+The repository on your host is mounted into the container as the
+workspace's `src/` folder (`./` → `/home/ubuntu/ros2_ws/src`):
+
+- Edit with your usual editor on the host, or inside the container. Both
+  see the same files, and nothing is lost when the container is removed.
+- The image is built with `--symlink-install`, so changes to existing
+  URDFs, worlds, launch files and configs take effect on the next launch,
+  without rebuilding.
+- After **adding** a file or a package, rebuild inside the container:
+
+  ```bash
+  cd ~/ros2_ws && colcon build --symlink-install && source install/setup.bash
+  ```
+
+  That build stays in the container until `docker compose down`. To bake it
+  into the image, run `docker compose up -d --build`.
+- The container user `ubuntu` has UID 1000. If your host user's UID differs
+  (`id -u`), files created inside the container will belong to a different
+  user on the host.
+
+### Settings
+
+Put optional settings in a `.env` file next to `docker-compose.yml`. It is
+excluded from the image by `.dockerignore`; don't commit it.
+
+| Variable | Default | Meaning |
 |---|---|---|
-| `sensor_test.sdf` | none | Flat ground with a red box, a green cylinder and a blue box, for checking the lidar and camera. Each robot package has its own copy. |
-| `maize_field.sdf` | 6 rows, 0.75 m apart, about 16 m long | Curved rows with gaps. The lanes are narrow: the Bunker Mini has about 9 cm of room on each side. |
-| `tomato_field.sdf` | 6 rows, 1.2 m apart, about 18 m long | Staked plants every 0.5 m. Seed 4676. |
-| `lettuce_field.sdf` | 6 rows, 1.0 m apart | A lettuce head every 0.3 m. **The heads are only 0.16 m tall, so the lidar (0.4–0.5 m up) can't see them**; this field is meant for camera-based navigation. Seed 3658. |
+| `PASSWD` | `fre2027` | Password of the `ubuntu` account inside the container, for when a program asks for it. |
+| `HOST_BIND` | `127.0.0.1` | Address the desktop listens on. With the default, only this computer can open it. `0.0.0.0` opens it to your network, but **the desktop has no login**, so first set `SELKIES_ENABLE_BASIC_AUTH=true` in `docker-compose.yml`. |
 
-The field worlds are in `hunter_se_description/worlds/`. Their plant,
-heightmap and material models are in `hunter_se_description/models/`. Every
-world loads the `gz-sim-sensors-system` plugin, which the lidar and camera
-need in order to publish.
+Example `.env`:
 
-Each robot spawns at the field's start pose: in the headland, facing down the
-first row.
+```bash
+PASSWD=my-own-password
+```
 
-| Field | x | y | yaw |
-|---|---|---|---|
-| maize | 0.8094 | -8.5386 | 1.5658 |
-| tomato | -1.4596 | -11.2231 | 1.6078 |
-| lettuce | 1.1736 | -8.8232 | 1.6164 |
+Screen size, frame rate and streaming bitrate are set in the `environment`
+section of `docker-compose.yml` (`DISPLAY_SIZEW`, `DISPLAY_SIZEH`,
+`SELKIES_FRAMERATE`, `SELKIES_VIDEO_BITRATE`). Apply a change with
+`docker compose up -d`.
 
-## 4. Requirements
+---
 
-- Ubuntu 24.04
-- ROS 2 Jazzy (`ros-jazzy-desktop`)
-- Gazebo Harmonic plus the ROS–Gazebo bridge, which come with `ros-jazzy-ros-gz`
+## 2. Native install (without Docker)
 
-Install the ROS packages these launch files use:
+Skip this section if you use Docker.
+
+You need **Ubuntu 24.04** with **ROS 2 Jazzy** installed
+([guide](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html)).
+Then:
+
+**1. Install the packages the simulation uses** (Gazebo Harmonic comes
+with `ros-jazzy-ros-gz`):
 
 ```bash
 sudo apt update
@@ -108,152 +214,108 @@ sudo apt install \
   ros-jazzy-teleop-twist-keyboard
 ```
 
-Alternatively, once the repo is cloned (next section), `rosdep` reads the
-`package.xml` files and installs whatever is missing:
-
-```bash
-cd ~/fre_ws
-rosdep install --from-paths src --ignore-src -y
-```
-
-## 5. Install and build
-
-The repository root holds the three packages, so clone it into the `src/`
-folder of a colcon workspace:
+**2. Clone the repository into a colcon workspace.** The repository root
+holds the packages, so it goes inside `src/`:
 
 ```bash
 mkdir -p ~/fre_ws/src
 cd ~/fre_ws/src
-git clone git@github.com:EASOUMO/FRE2027.git
-
-cd ~/fre_ws
-source /opt/ros/jazzy/setup.bash
-colcon build --symlink-install
-source install/setup.bash
+git clone https://github.com/EASOUMO/FRE2027.git
 ```
 
-`--symlink-install` links the installed files to the source tree, so changes
-to the URDFs, worlds and launch files take effect without rebuilding. A new
-file still needs a rebuild.
+**3. Install any missing dependencies, then build:**
 
-Run `source ~/fre_ws/install/setup.bash` in **every new terminal**, or add
-it to `~/.bashrc`:
+```bash
+cd ~/fre_ws
+source /opt/ros/jazzy/setup.bash
+rosdep install --from-paths src --ignore-src -y
+colcon build --symlink-install
+```
+
+If the build fails with `No module named 'catkin_pkg'`, see
+[Troubleshooting](#11-troubleshooting).
+
+**4. Source the workspace in every terminal.** Add it to `~/.bashrc` so
+that happens automatically:
 
 ```bash
 echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
 echo "source ~/fre_ws/install/setup.bash" >> ~/.bashrc
+source ~/.bashrc
 ```
 
-> If the build fails with `ModuleNotFoundError: No module named 'catkin_pkg'`,
-> see [Troubleshooting](#11-troubleshooting).
+`--symlink-install` links the installed files to the source tree, so
+changes to existing URDFs, worlds and launch files take effect without
+rebuilding. A new file needs `colcon build` again.
 
-## 6. Quick start
+---
 
-Start a robot in a field, with the Gazebo window:
+## 3. Running the simulation
 
-```bash
-ros2 launch bunker_mini_description maize_field.launch.py
-```
+Run these in a terminal **inside the container** (or, on a native install,
+in any sourced terminal).
 
-Then, in a second terminal, drive it from the keyboard (`i` forward, `j`/`l`
-turn, `k` stop; see [section 8](#8-driving-the-robots-teleoperation)):
+### Start a robot in a world
 
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard
-```
-
-Every combination of robot and world:
+Choose a robot package and a world:
 
 ```bash
 # <robot> is hunter_se, bunker_mini or ranger_mini
-ros2 launch <robot>_description gazebo.launch.py          # flat sensor_test world
 ros2 launch <robot>_description maize_field.launch.py
 ros2 launch <robot>_description tomato_field.launch.py
 ros2 launch <robot>_description lettuce_field.launch.py
+ros2 launch <robot>_description gazebo.launch.py          # flat sensor_test world
 ```
 
-Useful variations:
+For example:
 
 ```bash
-# Also open RViz with the lidar, camera images and TF
-ros2 launch ranger_mini_description tomato_field.launch.py rviz:=true
+ros2 launch ranger_mini_description tomato_field.launch.py
+```
 
-# No Gazebo window (faster; good for long runs, recording data or SSH sessions)
+Then drive it from a second terminal with
+`ros2 run teleop_twist_keyboard teleop_twist_keyboard`
+([section 4](#4-driving-the-robots-teleoperation)).
+
+### Common options
+
+Options are added after the launch file name as `name:=value`:
+
+```bash
+# Also open RViz with the lidar scan, camera images and TF frames
+ros2 launch ranger_mini_description tomato_field.launch.py visualization:=true
+
+# No Gazebo window: faster, for long runs or recording data. The sensors still publish.
 ros2 launch hunter_se_description maize_field.launch.py headless:=true
 
-# Spawn somewhere else
+# Spawn somewhere else (metres, radians)
 ros2 launch bunker_mini_description maize_field.launch.py x:=1.5 y:=-8.5 yaw:=1.57
 
-# Only view the robot model in RViz (no simulation), with sliders for the joints
+# View only the robot model in RViz (no simulation), with sliders for the joints
 ros2 launch ranger_mini_description description.launch.py
 ```
 
-Close a simulation with **Ctrl+C** in the terminal where you launched it.
-Don't use Ctrl+Z: it pauses Gazebo instead of stopping it, and the paused
-Gazebo interferes with the next launch (see
-[Troubleshooting](#11-troubleshooting)).
+[Section 5](#5-launch-files-and-arguments) lists every option.
 
-## 7. Launch files and arguments
+### Check that it works
 
-Every robot package has the same five launch files.
+In another terminal:
 
-### `gazebo.launch.py`: simulation in any world
+```bash
+ros2 topic list                  # /scan, /camera/image_raw, /imu, /odom, /cmd_vel, ...
+ros2 topic hz /scan              # about 10 Hz
+ros2 topic echo /odom --once     # the robot's pose
+```
 
-This file does the work; the field launch files below call it. It:
+### Stop the simulation
 
-1. adds the package share directory and `model_path` to `GZ_SIM_RESOURCE_PATH`,
-   so Gazebo can find the `package://` meshes and the `model://` plants,
-2. starts Gazebo with `world`, already running (`-r`),
-3. starts `robot_state_publisher` with the URDF (run through `xacro`),
-4. spawns the robot from the `robot_description` topic,
-5. starts `ros_gz_bridge` with `config/gz_bridge.yaml`,
-6. on the Ranger Mini only, starts `four_ws_controller.py`,
-7. if `rviz:=true`, opens RViz with `rviz/sensors.rviz`.
+Press **Ctrl+C** in the terminal where you launched it. Don't use Ctrl+Z:
+it pauses Gazebo without stopping it, and the paused Gazebo interferes
+with the next launch (see [Troubleshooting](#11-troubleshooting)).
 
-It also warns you if another Gazebo is already running.
+---
 
-| Argument | Default | Meaning |
-|---|---|---|
-| `world` | `<pkg>/worlds/sensor_test.sdf` | SDF world to load; it must contain the `gz-sim-sensors-system` plugin |
-| `model` | `<pkg>/urdf/<robot>.urdf` | Robot URDF or xacro file |
-| `model_path` | `<pkg>/worlds` | Extra directory searched for `model://` URIs (Bunker and Ranger only; the Hunter SE always searches its own `models/`) |
-| `headless` | `false` | `true` runs the Gazebo server only, with headless rendering (sensors still work) |
-| `rviz` | `false` | `true` opens RViz |
-| `x`, `y`, `z`, `yaw` | `0`, `0`, height above ground, `0` | Spawn pose, in metres and radians |
-
-Every node is started with `use_sim_time: true`.
-
-### `maize_field.launch.py`, `tomato_field.launch.py`, `lettuce_field.launch.py`
-
-These call `gazebo.launch.py` with the field's world from
-`hunter_se_description/worlds/`, set `model_path` to
-`hunter_se_description/models/`, and set the spawn pose to the field's
-start pose (see [the worlds](#3-the-worlds)).
-
-They accept `world`, `headless`, `rviz`, `x`, `y`, `z` and `yaw`, and pass
-them on. The spawn height `z` is 0.65 m for the Hunter SE and Bunker Mini
-and 0.50 m for the Ranger Mini: the robot is dropped a little onto the uneven
-ground.
-
-### `description.launch.py`: the model only, no simulation
-
-Starts `robot_state_publisher`, a joint state publisher and RViz, for checking the URDF, frames and meshes.
-
-| Argument | Default | Meaning |
-|---|---|---|
-| `model` | `<pkg>/urdf/<robot>.urdf` | Robot URDF or xacro file |
-| `gui` | `true` | `true` shows joint sliders (`joint_state_publisher_gui`); `false` uses the plain `joint_state_publisher` |
-| `rviz` | `true` | Start RViz |
-| `rvizconfig` | `<pkg>/rviz/display.rviz` (`rviz.rviz` for the Hunter SE) | RViz config file |
-| `use_sim_time` | `false` | Use the simulation clock |
-
-Run `ros2 launch <pkg> <file> --show-args` to list any launch file's
-arguments.
-
-`hunter_se_description` also has a sixth launch file, `generated_field.launch.py`
-(see [section 10](#10-using-a-newly-generated-field)).
-
-## 8. Driving the robots (teleoperation)
+## 4. Driving the robots (teleoperation)
 
 All three robots take `geometry_msgs/msg/Twist` on **`/cmd_vel`**:
 `linear.x` is the forward speed in m/s, `linear.y` the sideways speed (Ranger
@@ -262,16 +324,16 @@ standard ROS keyboard teleop.
 
 ### Keyboard teleop
 
-Start a simulation in one terminal, then run this in a **second terminal**:
+Start a simulation ([section 3](#3-running-the-simulation)), then run
+this in a **second terminal**:
 
 ```bash
-source ~/fre_ws/install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
 Keep that terminal focused while driving: it reads keys only when it is the
-active window. If `teleop_twist_keyboard` isn't installed, install it with
-`sudo apt install ros-jazzy-teleop-twist-keyboard`.
+active window. The Docker image already includes `teleop_twist_keyboard`;
+on a native install it comes from `ros-jazzy-teleop-twist-keyboard`.
 
 **Press a key once, not repeatedly.** Each key press sends one command,
 and the robot keeps doing it until another key changes it. Press **`k`**
@@ -364,6 +426,132 @@ It publishes the eight joint commands on `/steering/{fl,fr,rl,rr}` (angle in
 rad) and `/wheel/{fl,fr,rl,rr}` (speed in rad/s) as `std_msgs/msg/Float64`.
 You can publish to these directly to test a single wheel.
 
+---
+
+## 5. Launch files and arguments
+
+Every robot package has the same five launch files.
+
+### `gazebo.launch.py`: simulation in any world
+
+This file does the work; the field launch files below call it. It:
+
+1. adds the package share directory and `model_path` to `GZ_SIM_RESOURCE_PATH`,
+   so Gazebo can find the `package://` meshes and the `model://` plants,
+2. starts Gazebo with `world`, already running (`-r`),
+3. starts `robot_state_publisher` with the URDF (run through `xacro`),
+4. spawns the robot from the `robot_description` topic,
+5. starts `ros_gz_bridge` with `config/gz_bridge.yaml`,
+6. on the Ranger Mini only, starts `four_ws_controller.py`,
+7. if `visualization:=true` (or `rviz:=true`), opens RViz with `rviz/sensors.rviz`.
+
+It also warns you if another Gazebo is already running.
+
+| Argument | Default | Meaning |
+|---|---|---|
+| `world` | `<pkg>/worlds/sensor_test.sdf` | SDF world to load; it must contain the `gz-sim-sensors-system` plugin |
+| `model` | `<pkg>/urdf/<robot>.urdf` | Robot URDF or xacro file |
+| `model_path` | `<pkg>/worlds` | Extra directory searched for `model://` URIs (Bunker and Ranger only; the Hunter SE always searches its own `models/`) |
+| `headless` | `false` | `true` runs the Gazebo server only, with headless rendering (sensors still work) |
+| `visualization` | `false` | `true` opens RViz with `rviz/sensors.rviz` (lidar scan, camera images, TF, robot model) |
+| `rviz` | `false` | same as `visualization`; either one set to `true` opens RViz |
+| `x`, `y`, `z`, `yaw` | `0`, `0`, height above ground, `0` | Spawn pose, in metres and radians |
+
+Every node is started with `use_sim_time: true`.
+
+### `maize_field.launch.py`, `tomato_field.launch.py`, `lettuce_field.launch.py`
+
+These call `gazebo.launch.py` with the field's world from
+`hunter_se_description/worlds/`, set `model_path` to
+`hunter_se_description/models/`, and set the spawn pose to the field's
+start pose (see [the worlds](#8-the-worlds)).
+
+They accept `world`, `headless`, `visualization`, `rviz`, `x`, `y`, `z` and `yaw`, and pass
+them on. The spawn height `z` is 0.65 m for the Hunter SE and Bunker Mini
+and 0.50 m for the Ranger Mini: the robot is dropped a little onto the uneven
+ground.
+
+### `description.launch.py`: the model only, no simulation
+
+Starts `robot_state_publisher`, a joint state publisher and RViz, for checking the URDF, frames and meshes.
+
+| Argument | Default | Meaning |
+|---|---|---|
+| `model` | `<pkg>/urdf/<robot>.urdf` | Robot URDF or xacro file |
+| `gui` | `true` | `true` shows joint sliders (`joint_state_publisher_gui`); `false` uses the plain `joint_state_publisher` |
+| `rviz` | `true` | Start RViz |
+| `rvizconfig` | `<pkg>/rviz/display.rviz` (`rviz.rviz` for the Hunter SE) | RViz config file |
+| `use_sim_time` | `false` | Use the simulation clock |
+
+Run `ros2 launch <pkg> <file> --show-args` to list any launch file's
+arguments.
+
+`hunter_se_description` also has a sixth launch file, `generated_field.launch.py`
+(see [section 10](#10-using-a-newly-generated-field)).
+
+---
+
+## 6. Packages
+
+| Package | What it contains |
+|---|---|
+| `hunter_se_description` | The **Hunter SE** robot, **plus the three field worlds and all their plant and terrain models**. The other two packages load their fields from here, so it is always required. |
+| `bunker_mini_description` | The **Bunker Mini** robot: URDF, meshes, Gazebo bridge config, RViz configs and launch files. |
+| `ranger_mini_description` | The **Ranger Mini** robot: the same files, plus `four_ws_controller.py`, which turns `cmd_vel` into steering angles and wheel speeds. |
+
+All three are `ament_cmake` packages that install their files only; nothing is
+compiled.
+
+## 7. The robots
+
+| | Hunter SE | Bunker Mini | Ranger Mini |
+|---|---|---|---|
+| Drive type | Ackermann (car-like): rear-wheel drive, front steering | Tracked, skid-steer | Four-wheel independent steering |
+| What executes `cmd_vel` | Gazebo `AckermannSteering` plugin | Gazebo `DiffDrive` plugin | `four_ws_controller.py` node → Gazebo joint controllers |
+| Can turn on the spot | no (steering limit 0.52 rad, 30°) | yes | yes |
+| Can move sideways (`linear.y`) | no | no | yes (crab mode) |
+| Speed limit in the model | 4.8 m/s | 1.5 m/s, 2.0 rad/s | 1.5 m/s at any wheel |
+| Gazebo model name | `hunter_se` | `bunker_mini` | `ranger_mini` |
+| URDF | `urdf/hunter_se_description.urdf` | `urdf/bunker_mini.urdf` | `urdf/ranger_mini.urdf` |
+
+Modelling notes:
+
+- **Bunker Mini:** the body is a single rigid mesh, so the tracks are drawn
+  but don't move. Six hidden wheels (three per side) stand in for the tracks.
+  The middle pair grips fully and the end pairs grip less, so the robot
+  pivots about its centre the way a tracked robot does.
+- **Ranger Mini:** the visual is one whole-robot mesh as well. The four
+  steering modules and wheels underneath are hidden links that carry the
+  physics.
+- **Sensor mount:** the same mount (Onshape export) is fixed to the top
+  deck of every robot. It holds the lidar, with the camera on the front
+  facing forward.
+
+## 8. The worlds
+
+| World file | Rows | Notes |
+|---|---|---|
+| `sensor_test.sdf` | none | Flat ground with a red box, a green cylinder and a blue box, for checking the lidar and camera. Each robot package has its own copy. |
+| `maize_field.sdf` | 6 rows, 0.75 m apart, about 16 m long | Curved rows with gaps. The lanes are narrow: the Bunker Mini has about 9 cm of room on each side. |
+| `tomato_field.sdf` | 6 rows, 1.2 m apart, about 18 m long | Staked plants every 0.5 m. Seed 4676. |
+| `lettuce_field.sdf` | 6 rows, 1.0 m apart | A lettuce head every 0.3 m. **The heads are only 0.16 m tall, so the lidar (0.4–0.5 m up) can't see them**; this field is meant for camera-based navigation. Seed 3658. |
+
+The field worlds are in `hunter_se_description/worlds/`. Their plant,
+heightmap and material models are in `hunter_se_description/models/`. Every
+world loads the `gz-sim-sensors-system` plugin, which the lidar and camera
+need in order to publish.
+
+Each robot spawns at the field's start pose: in the headland, facing down the
+first row.
+
+| Field | x | y | yaw |
+|---|---|---|---|
+| maize | 0.8094 | -8.5386 | 1.5658 |
+| tomato | -1.4596 | -11.2231 | 1.6078 |
+| lettuce | 1.1736 | -8.8232 | 1.6164 |
+
+---
+
 ## 9. Topics, frames and sensors
 
 ### ROS topics
@@ -439,16 +627,37 @@ To keep a generated field in the repo permanently:
    change the world name and the start pose (the generator writes the pose
    into `robot_spawner.launch.py`).
 
+---
+
 ## 11. Troubleshooting
 
-**The robot doesn't appear, or the Gazebo window stays empty.**
-A Gazebo from an earlier launch is probably still running, often one that
-was paused with Ctrl+Z. The launch file prints a warning when it finds one.
-Stop it, then launch again:
+### Docker
 
-```bash
-pkill -9 -f "gz sim"
-```
+**`docker compose up` fails with `could not select device driver "nvidia"`.**
+The NVIDIA Container Toolkit isn't installed or isn't registered with
+Docker. Do step 1 of [section 1](#1-getting-started-with-docker-recommended),
+then check that `docker info | grep -i runtimes` lists `nvidia`.
+
+**`permission denied while trying to connect to the Docker daemon socket`.**
+Your user isn't in the `docker` group. Run `sudo usermod -aG docker $USER`,
+then log out and back in.
+
+**http://127.0.0.1:8080 doesn't load.**
+Check `docker compose ps` (it should say `Up`) and
+`docker compose logs -f`. The desktop needs a few seconds after the
+container starts. If another program already uses port 8080, change the
+left-hand port in `docker-compose.yml`, for example
+`'${HOST_BIND:-127.0.0.1}:8081:8080'`, then open port 8081.
+
+**The build fails at `apt-get update` or `rosdep`.**
+This is usually a network or mirror problem; run `docker compose build`
+again. If it fails at the `rosdep install` step after you changed a
+`package.xml`, the message names the dependency that has no apt package.
+
+**A new package isn't found inside the container.**
+Rebuild in the container: `cd ~/ros2_ws && colcon build --symlink-install && source install/setup.bash`.
+
+### Build (native install)
 
 **`colcon build` fails with `No module named 'catkin_pkg'`.**
 Another Python (for example `~/.local/bin/python3.11`, or a conda or
@@ -464,9 +673,20 @@ The field launch files of every robot load their worlds from
 `hunter_se_description`. Build the whole workspace (don't use
 `--packages-select` with only one robot) and source `install/setup.bash`.
 
+### Simulation
+
+**The robot doesn't appear, or the Gazebo window stays empty.**
+A Gazebo from an earlier launch is probably still running, often one that
+was paused with Ctrl+Z. The launch file prints a warning when it finds one.
+Stop it, then launch again:
+
+```bash
+pkill -9 -f "gz sim"
+```
+
 **RViz shows nothing, but `ros2 topic echo` shows data.**
 RViz is running on wall-clock time and drops the simulation-stamped messages.
-Use `rviz:=true` on the simulation launch, which sets `use_sim_time`, or run
+Use `visualization:=true` on the simulation launch, which sets `use_sim_time`, or run
 `ros2 param set /rviz2 use_sim_time true`.
 
 **`libEGL warning: egl: failed to create dri2 screen` with `headless:=true`.**
@@ -479,6 +699,12 @@ the robot's position in the world, so in a field it starts at the spawn pose,
 for example (-1.46, -11.22) in the tomato field. Allow for this when your
 code compares positions between robots.
 
+**Other software on the same network sees these topics.**
+Use a separate ROS domain, for example `export ROS_DOMAIN_ID=42`, in every
+terminal you use with the simulation.
+
+### Teleoperation
+
 **The robot doesn't move when I press keys.**
 Click on the teleop terminal first; it only reads keys while it has focus.
 Check that the command arrives with `ros2 topic echo /cmd_vel`. If the
@@ -490,15 +716,16 @@ or in neither. On the Hunter SE, `j` and `l` do nothing; use `u` / `o`.
 That is how `teleop_twist_keyboard` works: a key press is a command that
 lasts until the next one. Press `k` to stop.
 
-**Other software on the same network sees these topics.**
-Use a separate ROS domain, for example `export ROS_DOMAIN_ID=42`, in every
-terminal you use with the simulation.
+---
 
 ## 12. Repository layout
 
 ```
 FRE2027/
 ├── README.md
+├── Dockerfile                       ROS 2 Jazzy + Gazebo desktop image (section 1)
+├── docker-compose.yml               runs it, desktop on http://127.0.0.1:8080
+├── .dockerignore
 ├── hunter_se_description/
 │   ├── config/gz_bridge.yaml        ROS <-> Gazebo topic bridge
 │   ├── launch/                      description, gazebo, generated_field, *_field

@@ -6,6 +6,8 @@
 Dockerfile
 .dockerignore
 docker-compose.yml
-docs/
-resources/
-README.md
+# colcon output and Python caches from a build on the host
+build/
+install/
+log/
+**/__pycache__

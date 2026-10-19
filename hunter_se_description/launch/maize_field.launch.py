@@ -18,6 +18,9 @@ def generate_launch_description():
     rviz_arg = DeclareLaunchArgument(
         name='rviz', default_value='false', choices=['true', 'false'],
         description='Start RViz')
+    visualization_arg = DeclareLaunchArgument(
+        name='visualization', default_value='false', choices=['true', 'false'],
+        description='Start RViz (same as rviz:=true)')
 
     # Defaults are the start pose virtual_maize_field wrote to robot_spawner.launch.py
     # for this world (seed 7766): in the headland, facing down the first row
@@ -27,7 +30,7 @@ def generate_launch_description():
         for name, default in (('x', '0.8094'), ('y', '-8.5386'), ('z', '0.65'),
                               ('yaw', '1.5658'))]
 
-    forwarded = ('world', 'headless', 'rviz', 'x', 'y', 'z', 'yaw')
+    forwarded = ('world', 'headless', 'rviz', 'visualization', 'x', 'y', 'z', 'yaw')
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(str(pkg_share / 'launch/gazebo.launch.py')),
         launch_arguments={name: LaunchConfiguration(name) for name in forwarded}.items())
@@ -36,6 +39,7 @@ def generate_launch_description():
         world_arg,
         headless_arg,
         rviz_arg,
+        visualization_arg,
         *pose_args,
         gazebo,
     ])

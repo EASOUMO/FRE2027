@@ -60,6 +60,9 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
 #    - ros-jazzy-ros-gz  : ROS <-> Gazebo bridge. On Jazzy this pulls in
 #                          Gazebo Harmonic from the ROS repo (gz_*_vendor
 #                          packages), so the separate OSRF repo is not needed.
+#    - ros-jazzy-teleop-twist-keyboard : keyboard driving (README, section 8);
+#                          no package.xml depends on it, so rosdep would not
+#                          install it.
 # -----------------------------------------------------------------------------
 RUN sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
         -o /usr/share/keyrings/ros-archive-keyring.gpg \
@@ -69,6 +72,7 @@ RUN sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.ke
         ros-${ROS_DISTRO}-desktop \
         ros-dev-tools \
         ros-${ROS_DISTRO}-ros-gz \
+        ros-${ROS_DISTRO}-teleop-twist-keyboard \
     && sudo apt-get clean \
     && sudo rm -rf /var/lib/apt/lists/*
 
@@ -91,9 +95,9 @@ WORKDIR /home/ubuntu/ros2_ws
 # Copy only the package manifests first and install their dependencies.
 # This layer is cached and is only rebuilt when a package.xml changes, so
 # editing source code does not trigger a full dependency reinstall.
-COPY --chown=1000:1000 parc_robot/package.xml             src/parc_robot/package.xml
-COPY --chown=1000:1000 parc_robot_bringup/package.xml     src/parc_robot_bringup/package.xml
-COPY --chown=1000:1000 parc_robot_description/package.xml src/parc_robot_description/package.xml
+COPY --chown=1000:1000 hunter_se_description/package.xml   src/hunter_se_description/package.xml
+COPY --chown=1000:1000 bunker_mini_description/package.xml src/bunker_mini_description/package.xml
+COPY --chown=1000:1000 ranger_mini_description/package.xml src/ranger_mini_description/package.xml
 
 # Note: in this base image `sudo` is a symlink to `fakeroot` (system files are
 # owned by "ubuntu", fakeroot just makes apt believe it runs as root).

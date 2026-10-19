@@ -46,6 +46,9 @@ def generate_launch_description():
     rviz_arg = DeclareLaunchArgument(
         name='rviz', default_value='false', choices=['true', 'false'],
         description='Start RViz')
+    visualization_arg = DeclareLaunchArgument(
+        name='visualization', default_value='false', choices=['true', 'false'],
+        description='Start RViz (same as rviz:=true)')
     model_path_arg = DeclareLaunchArgument(
         name='model_path', default_value=str(pkg_share / 'worlds'),
         description='Directory searched for the model://... URIs of the world')
@@ -103,7 +106,10 @@ def generate_launch_description():
         output='screen',
         arguments=['-d', str(pkg_share / 'rviz/sensors.rviz')],
         parameters=[{'use_sim_time': True}],
-        condition=IfCondition(LaunchConfiguration('rviz')))
+        # rviz:=true or visualization:=true
+        condition=IfCondition(PythonExpression([
+            "'", LaunchConfiguration('rviz'), "' == 'true' or '",
+            LaunchConfiguration('visualization'), "' == 'true'"])))
 
     return LaunchDescription([
         OpaqueFunction(function=warn_if_gazebo_running),
@@ -111,6 +117,7 @@ def generate_launch_description():
         world_arg,
         headless_arg,
         rviz_arg,
+        visualization_arg,
         model_path_arg,
         *pose_args,
         set_resource_path,

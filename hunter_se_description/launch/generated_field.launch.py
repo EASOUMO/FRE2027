@@ -110,6 +110,7 @@ def launch_setup(context):
                 'x': str(pose['x']), 'y': str(pose['y']), 'z': str(z), 'yaw': str(pose['yaw']),
                 'headless': cfg['headless'],
                 'rviz': cfg['rviz'],
+                'visualization': cfg['visualization'],
             }.items()),
     ]
 
@@ -134,6 +135,9 @@ def generate_launch_description():
         DeclareLaunchArgument(
             name='rviz', default_value='false', choices=['true', 'false'],
             description='Start RViz'),
+        DeclareLaunchArgument(
+            name='visualization', default_value='false', choices=['true', 'false'],
+            description='Start RViz (same as rviz:=true)'),
         *[DeclareLaunchArgument(name=name, default_value='',
                                 description=f'Spawn pose: {name} (default: the start pose the generator chose)')
           for name in ('x', 'y', 'z', 'yaw')],
