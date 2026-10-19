@@ -79,7 +79,7 @@ You need:
 |---|---|---|
 | Linux with Docker Engine and the Compose plugin ([install guide](https://docs.docker.com/engine/install/ubuntu/)) | both | `docker compose version` |
 | Docker usable without `sudo` | both | `docker run --rm hello-world` |
-| About 20 GB of free disk space | both | `df -h ~` |
+| About 30 GB of free disk space (the built image alone is about 19 GB) | both | `df -h /var/lib/docker` |
 | An NVIDIA GPU and its driver | GPU only | `nvidia-smi` lists your GPU |
 | [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) | GPU only | `docker info \| grep -i runtimes` lists `nvidia` |
 
@@ -107,21 +107,56 @@ cd FRE2027
 
 ### Step 3: Build the image and start the container
 
-Run this in the repository root, the folder that contains
-`docker-compose.yml`:
+Both setups use the **same image**, `fre2027-ws:latest`, built from the
+`Dockerfile` in the repository root. They differ only in how the container
+is started. The build:
+
+1. pulls the desktop base image (`ghcr.io/selkies-project/nvidia-egl-desktop`, about 12.5 GB on disk),
+2. installs ROS 2 Jazzy, Gazebo Harmonic, `ros-dev-tools` and `teleop_twist_keyboard`,
+3. installs the packages' dependencies with `rosdep`,
+4. copies the repository into `/home/ubuntu/ros2_ws/src` and builds it with
+   `colcon build --symlink-install`.
+
+Run one of these in the repository root, the folder that contains
+`docker-compose.yml`. Each builds the image if needed, then starts the
+container:
 
 ```bash
 docker compose up -d --build                  # GPU setup
 docker compose up -d --build FRE2027_ws_cpu   # CPU setup
 ```
 
-The first build downloads the desktop base image and ROS, which takes
-roughly 10–30 minutes depending on your connection. Later starts take
-seconds. Check that the container is running:
+The first build takes roughly 10–30 minutes, depending on your connection,
+and the finished image takes about 19 GB. Later starts take seconds.
+
+To only build the image, without starting anything:
 
 ```bash
-docker compose ps        # STATUS should be "Up"
+docker compose build
 ```
+
+Check that the container is running:
+
+```bash
+docker compose ps                  # GPU setup: STATUS should be "Up"
+docker compose --profile cpu ps    # CPU setup: FRE2027_ws_cpu should be "Up"
+```
+
+**When to rebuild.** You don't need to rebuild after editing code, URDFs,
+worlds or launch files: the repository is mounted into the container (see
+[Editing files](#editing-files)). Rebuild with the same `up -d --build`
+command after changing a `package.xml`, the `Dockerfile` or
+`docker-compose.yml`. Docker reuses the cached steps, so only the changed
+part is redone.
+
+**If the build fails:**
+
+- `apt-get update` or a download fails: check your internet connection and
+  run the command again. Docker resumes from the last completed step.
+- `no space left on device`: free space with `docker system prune` (it
+  removes stopped containers and the unused build cache), then try again.
+- To rebuild from scratch, ignoring the cache:
+  `docker compose build --no-cache`.
 
 ### Step 4: Open the desktop
 
