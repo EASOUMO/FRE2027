@@ -4,6 +4,7 @@
 #   Openbox          window manager (opens a terminal, see
 #                    /etc/xdg/openbox/autostart)
 #   websockify       serves noVNC on port 8080 and relays it to the VNC server
+#                    (novnc-server.py: websockify that tells browsers not to cache)
 # Settings come from the environment (docker-compose.yml).
 set -euo pipefail
 
@@ -33,7 +34,7 @@ for _ in $(seq 100); do
 done
 
 dbus-launch --exit-with-session openbox-session &
-websockify --web /opt/novnc 8080 localhost:5901 &
+novnc-server.py --web /opt/novnc 8080 localhost:5901 &
 
 echo "Desktop ready: open http://127.0.0.1:8080"
 # Stop the container if any of them exits.

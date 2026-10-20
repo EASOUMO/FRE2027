@@ -136,6 +136,10 @@ RUN { \
 
 COPY docker/cpu-desktop/openbox/ /etc/xdg/openbox/
 COPY docker/cpu-desktop/start-desktop.sh /usr/local/bin/start-desktop.sh
+# So that http://127.0.0.1:8080 always shows this desktop, also in a browser
+# that has opened the GPU setup there before (see the two files).
+COPY docker/cpu-desktop/sw.js /opt/novnc/sw.js
+COPY docker/cpu-desktop/novnc-server.py /usr/local/bin/novnc-server.py
 
 EXPOSE 8080
 CMD ["/usr/local/bin/start-desktop.sh"]
